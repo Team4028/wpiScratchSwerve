@@ -18,6 +18,9 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  */
 public final class Constants {
   public static final class DriveConstants {
+
+    public static final boolean MK4I = true;
+
     public static final int kFrontLeftDriveMotorPort = 1;
     public static final int kRearLeftDriveMotorPort = 6;
     public static final int kFrontRightDriveMotorPort = 4;
@@ -27,6 +30,21 @@ public final class Constants {
     public static final int kRearLeftTurningMotorPort = 5;
     public static final int kFrontRightTurningMotorPort = 3;
     public static final int kRearRightTurningMotorPort = 8;
+
+    public static final int i_kFrontLeftDriveMotorPort = 2;
+    public static final int i_kRearLeftDriveMotorPort = 6;
+    public static final int i_kFrontRightDriveMotorPort = 4;
+    public static final int i_kRearRightDriveMotorPort = 8;
+
+    public static final int i_kFrontLeftTurningMotorPort = 1;
+    public static final int i_kRearLeftTurningMotorPort = 5;
+    public static final int i_kFrontRightTurningMotorPort = 3;
+    public static final int i_kRearRightTurningMotorPort = 7;
+
+    public static final int i_kFrontLeftEncoderCan = 1;//filler values
+    public static final int i_kRearLeftEncoderCan = 3;
+    public static final int i_kFrontRightEncoderCan = 2;
+    public static final int i_kRearRightEncoderCan = 4;
 
     // public static final int[] kFrontLeftTurningEncoderPorts = new int[] {0, 1};
     // public static final int[] kRearLeftTurningEncoderPorts = new int[] {2, 3};
@@ -48,9 +66,9 @@ public final class Constants {
     // public static final boolean kFrontRightDriveEncoderReversed = false;
     // public static final boolean kRearRightDriveEncoderReversed = true;
 
-    public static final double kTrackWidth = util.inchesToMeters(23.5);
+    public static final double kTrackWidth = util.inchesToMeters(23.75);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = util.inchesToMeters(21.5);
+    public static final double kWheelBase = util.inchesToMeters(25.75);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics =
         new SwerveDriveKinematics(
@@ -94,6 +112,26 @@ public final class Constants {
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  public static final class MK4IModuleConstants {
+    public static final double i_kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
+    public static final double i_kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
+
+    public static final int i_kEncoderCPR = 4096;
+    public static final double i_kWheelDiameterMeters = util.inchesToMeters(4.0);
+    public static final double i_kDriveEncoderDistancePerPulse =
+        // Assumes the encoders are directly mounted on the wheel shafts
+        (i_kWheelDiameterMeters * Math.PI) * (1.0 / (50.0 / 14.0) / (17.0 / 27.0) / (45.0 / 15.0));
+
+    public static final double i_kTurningEncoderDistancePerPulse =
+        // Assumes the encoders are on a 1:1 reduction with the module shaft.
+        (2 * Math.PI) / (double) i_kEncoderCPR;
+
+    public static final double i_kPModuleTurningController = 0.0;
+
+    public static final double i_kPModuleDriveController = 0;
+  }
+
 
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = util.feetToMeters(12);
