@@ -23,10 +23,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
 
-  // private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(146.7);//0.0);//60.6);//60.7
-  // private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(147.0);//141.2);//139.1
-  // private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(314.6);//60.6);//60.7
-  // private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(70.9);//60.3);//60.7
+  private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(146.7);//0.0);//60.6);//60.7
+  private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(147.0);//141.2);//139.1
+  private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(314.6);//60.6);//60.7
+  private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(70.9);//60.3);//60.7
 
   // private  SwerveModule m_frontLeft;
   // private  SwerveModule m_frontRight;
@@ -34,10 +34,10 @@ public class DriveSubsystem extends SubsystemBase {
   // private  SwerveModule m_rearRight;
 
 
-  private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(0);//0.0);//60.6);//60.7
-  private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(0);//141.2);//139.1
-  private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(0);//60.6);//60.7
-  private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(0);//60.3);//60.7
+  private static final double i_FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(204.6);//0.0);//60.6);//60.7
+  private static final double i_FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(204.2);//141.2);//139.1
+  private static final double i_BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(329.4);//60.6);//60.7
+  private static final double i_BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(160.6);//60.3);//60.7
 
   private static DriveSubsystem _instance;
   public static final DriveSubsystem get_instance(){
@@ -52,28 +52,28 @@ public class DriveSubsystem extends SubsystemBase {
           i_kFrontLeftDriveMotorPort,
           i_kFrontLeftTurningMotorPort,
           i_kFrontLeftEncoderCan,
-          FRONT_LEFT_ANGLE_OFFSET);
+          i_FRONT_LEFT_ANGLE_OFFSET);
 
      private final SwerveModuleCAN m_rearLeft =
       new SwerveModuleCAN(
           i_kRearLeftDriveMotorPort,
           i_kRearLeftTurningMotorPort,
           i_kRearLeftEncoderCan,
-          BACK_LEFT_ANGLE_OFFSET);
+          i_BACK_LEFT_ANGLE_OFFSET);
 
      private final SwerveModuleCAN m_frontRight =
       new SwerveModuleCAN(
           i_kFrontRightDriveMotorPort,
           i_kFrontRightTurningMotorPort,
           i_kFrontRightEncoderCan,
-          FRONT_RIGHT_ANGLE_OFFSET);
+          i_FRONT_RIGHT_ANGLE_OFFSET);
 
     private final SwerveModuleCAN m_rearRight =
       new SwerveModuleCAN(
           i_kRearRightDriveMotorPort,
           i_kRearRightTurningMotorPort,
           i_kRearRightEncoderCan,
-          BACK_RIGHT_ANGLE_OFFSET);
+          i_BACK_RIGHT_ANGLE_OFFSET);
 
     //      private final SwerveModule m_frontLeft =
     //   new SwerveModule(
@@ -127,6 +127,10 @@ public class DriveSubsystem extends SubsystemBase {
 
     SmartDashboard.putNumber("X (Feet)", util.metersToFeet(m_odometry.getPoseMeters().getX()));
     SmartDashboard.putNumber("Y (Feet)", util.metersToFeet(m_odometry.getPoseMeters().getY()));
+    SmartDashboard.putNumber("FL Angle", m_frontLeft.getState().angle.getDegrees());
+    SmartDashboard.putNumber("FR Angle", m_frontRight.getState().angle.getDegrees());
+    SmartDashboard.putNumber("RL Angle", m_rearLeft.getState().angle.getDegrees());
+    SmartDashboard.putNumber("RR Angle", m_rearRight.getState().angle.getDegrees());
   }
 
   /**

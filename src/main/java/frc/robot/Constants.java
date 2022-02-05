@@ -41,30 +41,11 @@ public final class Constants {
     public static final int i_kFrontRightTurningMotorPort = 3;
     public static final int i_kRearRightTurningMotorPort = 7;
 
-    public static final int i_kFrontLeftEncoderCan = 1;//filler values
+    public static final int i_kFrontLeftEncoderCan = 1;
     public static final int i_kRearLeftEncoderCan = 3;
     public static final int i_kFrontRightEncoderCan = 2;
     public static final int i_kRearRightEncoderCan = 4;
 
-    // public static final int[] kFrontLeftTurningEncoderPorts = new int[] {0, 1};
-    // public static final int[] kRearLeftTurningEncoderPorts = new int[] {2, 3};
-    // public static final int[] kFrontRightTurningEncoderPorts = new int[] {4, 5};
-    // public static final int[] kRearRightTurningEncoderPorts = new int[] {6, 7};
-
-    // public static final boolean kFrontLeftTurningEncoderReversed = false;
-    // public static final boolean kRearLeftTurningEncoderReversed = true;
-    // public static final boolean kFrontRightTurningEncoderReversed = false;
-    // public static final boolean kRearRightTurningEncoderReversed = true;
-
-    // public static final int[] kFrontLeftDriveEncoderPorts = new int[] {8, 9};
-    // public static final int[] kRearLeftDriveEncoderPorts = new int[] {10, 11};
-    // public static final int[] kFrontRightDriveEncoderPorts = new int[] {12, 13};
-    // public static final int[] kRearRightDriveEncoderPorts = new int[] {14, 15};
-
-    // public static final boolean kFrontLeftDriveEncoderReversed = false;
-    // public static final boolean kRearLeftDriveEncoderReversed = true;
-    // public static final boolean kFrontRightDriveEncoderReversed = false;
-    // public static final boolean kRearRightDriveEncoderReversed = true;
 
     public static final double kTrackWidth = util.inchesToMeters(23.75);
     // Distance between centers of right and left wheels on robot
@@ -77,7 +58,7 @@ public final class Constants {
             new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
             new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-    public static final boolean kGyroReversed = true;
+    public static final boolean kGyroReversed = false; //true for mk2 chassis
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
@@ -88,6 +69,7 @@ public final class Constants {
     public static final double kaVoltSecondsSquaredPerMeter = 0;
 
     public static final double kMaxSpeedMetersPerSecond = util.feetToMeters(12.0);
+    public static final double i_kMaxSpeedMetersPerSecond = util.feetToMeters(16.3);
   }
 
   public static final class ModuleConstants {
@@ -127,7 +109,7 @@ public final class Constants {
         // Assumes the encoders are on a 1:1 reduction with the module shaft.
         (2 * Math.PI) / (double) i_kEncoderCPR;
 
-    public static final double i_kPModuleTurningController = 0.0;
+    public static final double i_kPModuleTurningController = 0.05;
 
     public static final double i_kPModuleDriveController = 0;
   }

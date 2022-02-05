@@ -5,7 +5,10 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorTimeBase;
@@ -25,7 +28,9 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.Constants;
 import frc.robot.util;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MK4IModuleConstants;
+import frc.robot.Constants.ModuleConstants;
 
 public class SwerveModuleCAN {
   private final TalonFX m_driveMotor;
@@ -40,15 +45,6 @@ public class SwerveModuleCAN {
   private final PIDController m_drivePIDController =
       new PIDController(0.0, 0, 0);
 
-  // Using a TrapezoidProfile PIDController to allow for smooth turning
-  // private final ProfiledPIDController m_turningPIDController =
-  //     new ProfiledPIDController(
-  //         MK4IModuleConstants.i_kPModuleTurningController,
-  //         0,
-  //         0.0001,
-  //         new TrapezoidProfile.Constraints(
-  //             MK4IModuleConstants.i_kMaxModuleAngularSpeedRadiansPerSecond,
-  //             MK4IModuleConstants.i_kMaxModuleAngularAccelerationRadiansPerSecondSquared));
   private final PIDController m_turningPIDController = new PIDController(MK4IModuleConstants.i_kPModuleTurningController, 0, 0.0);
 
   /**
@@ -64,35 +60,21 @@ public class SwerveModuleCAN {
       double turningMotorOffset) {
     m_driveMotor = new TalonFX(driveMotorChannel);
     m_turningMotor = new TalonFX(turningMotorChannel);
+    m_turningEncoder = new CANCoder(CANEncoderPort);
     this.turningMotorOffset = turningMotorOffset;
+    m_turningEncoder.setPositionToAbsolute();
 
     //this.m_driveEncoder = new Encoder(driveEncoderPorts[0], driveEncoderPorts[1]);
     m_driveMotor.configFactoryDefault();
     m_turningMotor.configFactoryDefault();
     m_driveMotor.setNeutralMode(NeutralMode.Brake);
-    m_turningMotor.setNeutralMode(NeutralMode.Brake);
+    m_turningMotor.setNeutralMode(NeutralMode.Coast);
   
-    m_turningEncoder = new CANCoder(CANEncoderPort);
+
     m_turningEncoder.configFeedbackCoefficient(2 * Math.PI / MK4IModuleConstants.i_kEncoderCPR, "rad", SensorTimeBase.PerSecond);
+    m_turningMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
     //m_turningEncoder = m_driveMotor.getEncoder();
-
-    // Set the distance per pulse for the drive encoder. We can simply use the
-    // distance traveled for one rotation of the wheel divided by the encoder
-    // resolution.
-    //m_driveMotor.setPositionConversionFactor(Constants.MK4IModuleConstants.i_kDriveEncoderDistancePerPulse);
-
-    //m_turningEncoder.setPosition(turningMotorOffset);
-
-
-    // Set whether drive encoder should be reversed or not
-    // m_driveEncoder.setReverseDirection(driveEncoderReversed);
-
-    // Set the distance (in this case, angle) per pulse for the turning encoder.
-    // This is the the angle through an entire rotation (2 * pi) divided by the
-    // encoder resolution.
-
-    // Set whether turning encoder should be reversed or not
-    // m_turningEncoder.setReverseDirection(turningEncoderReversed);
+    m_turningMotor.config_kP(0, MK4IModuleConstants.i_kPModuleTurningController);
 
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
@@ -137,7 +119,7 @@ public class SwerveModuleCAN {
 
     // Calculate the turning motor output from the turning PID controller.
     m_driveMotor.set(ControlMode.PercentOutput, driveOutput);
-    m_turningMotor.set(ControlMode.PercentOutput, turnOutput);
+    m_turningMotor.set(ControlMode.Position, turnOutput);
   }
 
   /** Zeros all the SwerveModule encoders. */
