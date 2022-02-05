@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -68,13 +69,12 @@ public class SwerveModuleCAN {
     m_driveMotor.configFactoryDefault();
     m_turningMotor.configFactoryDefault();
     m_driveMotor.setNeutralMode(NeutralMode.Brake);
-    m_turningMotor.setNeutralMode(NeutralMode.Coast);
+    m_turningMotor.setNeutralMode(NeutralMode.Brake);
+    m_turningMotor.setInverted(true);
   
-
-    m_turningEncoder.configFeedbackCoefficient(2 * Math.PI / MK4IModuleConstants.i_kEncoderCPR, "rad", SensorTimeBase.PerSecond);
-    m_turningMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
-    //m_turningEncoder = m_driveMotor.getEncoder();
-    m_turningMotor.config_kP(0, MK4IModuleConstants.i_kPModuleTurningController);
+    // m_turningMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+    // m_turningMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
+    // m_turningMotor.config_kP(0, MK4IModuleConstants.i_kPModuleTurningController);
 
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
@@ -111,7 +111,7 @@ public class SwerveModuleCAN {
 
     // Calculate the drive output from the drive PID controller.
     final double driveOutput =
-        state.speedMetersPerSecond/util.feetToMeters(12);//ontroller.calculate(m_driveEncoder.getVelocity(), state.speedMetersPerSecond);
+        state.speedMetersPerSecond / DriveConstants.i_kMaxSpeedMetersPerSecond;//ontroller.calculate(m_driveEncoder.getVelocity(), state.speedMetersPerSecond);
 
     // Calculate the turning motor output from the turning PID controller.
     final var turnOutput =
@@ -119,7 +119,7 @@ public class SwerveModuleCAN {
 
     // Calculate the turning motor output from the turning PID controller.
     m_driveMotor.set(ControlMode.PercentOutput, driveOutput);
-    m_turningMotor.set(ControlMode.Position, turnOutput);
+    m_turningMotor.set(ControlMode.PercentOutput, turnOutput);
   }
 
   /** Zeros all the SwerveModule encoders. */

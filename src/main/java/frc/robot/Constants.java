@@ -109,15 +109,15 @@ public final class Constants {
         // Assumes the encoders are on a 1:1 reduction with the module shaft.
         (2 * Math.PI) / (double) i_kEncoderCPR;
 
-    public static final double i_kPModuleTurningController = 0.05;
+    public static final double i_kPModuleTurningController = 0.5;
 
     public static final double i_kPModuleDriveController = 0;
   }
 
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = util.feetToMeters(12);
-    public static final double kMaxAccelerationMetersPerSecondSquared = util.feetToMeters(12);
+    public static final double kMaxSpeedMetersPerSecond = util.feetToMeters(6);
+    public static final double kMaxAccelerationMetersPerSecondSquared = util.feetToMeters(4);
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 

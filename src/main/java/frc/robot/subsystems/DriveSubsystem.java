@@ -34,10 +34,10 @@ public class DriveSubsystem extends SubsystemBase {
   // private  SwerveModule m_rearRight;
 
 
-  private static final double i_FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(204.6);//0.0);//60.6);//60.7
-  private static final double i_FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(204.2);//141.2);//139.1
-  private static final double i_BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(329.4);//60.6);//60.7
-  private static final double i_BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(160.6);//60.3);//60.7
+  private static final double i_FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(205.1);//204.6);//0.0);//60.6);//60.7
+  private static final double i_FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(203.9);//204.2);//141.2);//139.1
+  private static final double i_BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(328.1);//329.4);//60.6);//60.7
+  private static final double i_BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(160.5);//160.6);//60.3);//60.7
 
   private static DriveSubsystem _instance;
   public static final DriveSubsystem get_instance(){
@@ -161,13 +161,16 @@ public class DriveSubsystem extends SubsystemBase {
    */
   @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    xSpeed *= i_kMaxSpeedMetersPerSecond;
+    ySpeed *= i_kMaxSpeedMetersPerSecond;
+    rot *= i_kMaxSpeedMetersPerSecond;
     var swerveModuleStates =
         kDriveKinematics.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, Rotation2d.fromDegrees((kGyroReversed ? -1.0 : 1.0) * m_gyro.getRotation2d().getDegrees()))
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, kMaxSpeedMetersPerSecond);
+        swerveModuleStates, i_kMaxSpeedMetersPerSecond); //change for mk2
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
