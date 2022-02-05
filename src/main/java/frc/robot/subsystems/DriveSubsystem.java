@@ -47,61 +47,61 @@ public class DriveSubsystem extends SubsystemBase {
     return _instance;
   }
 
-      private final SwerveModuleCAN m_frontLeft =
-      new SwerveModuleCAN(
-          i_kFrontLeftDriveMotorPort,
-          i_kFrontLeftTurningMotorPort,
-          i_kFrontLeftEncoderCan,
-          i_FRONT_LEFT_ANGLE_OFFSET);
-
-     private final SwerveModuleCAN m_rearLeft =
-      new SwerveModuleCAN(
-          i_kRearLeftDriveMotorPort,
-          i_kRearLeftTurningMotorPort,
-          i_kRearLeftEncoderCan,
-          i_BACK_LEFT_ANGLE_OFFSET);
-
-     private final SwerveModuleCAN m_frontRight =
-      new SwerveModuleCAN(
-          i_kFrontRightDriveMotorPort,
-          i_kFrontRightTurningMotorPort,
-          i_kFrontRightEncoderCan,
-          i_FRONT_RIGHT_ANGLE_OFFSET);
-
-    private final SwerveModuleCAN m_rearRight =
-      new SwerveModuleCAN(
-          i_kRearRightDriveMotorPort,
-          i_kRearRightTurningMotorPort,
-          i_kRearRightEncoderCan,
-          i_BACK_RIGHT_ANGLE_OFFSET);
-
-    //      private final SwerveModule m_frontLeft =
-    //   new SwerveModule(
+    //   private final SwerveModuleCAN m_frontLeft =
+    //   new SwerveModuleCAN(
     //       i_kFrontLeftDriveMotorPort,
     //       i_kFrontLeftTurningMotorPort,
-    //       0,
+    //       i_kFrontLeftEncoderCan,
     //       i_FRONT_LEFT_ANGLE_OFFSET);
 
-    //  private final SwerveModule m_rearLeft =
-    //   new SwerveModule(
-    //       kRearLeftDriveMotorPort,
-    //       kRearLeftTurningMotorPort,
-    //       2,
-    //       BACK_LEFT_ANGLE_OFFSET);
+    //  private final SwerveModuleCAN m_rearLeft =
+    //   new SwerveModuleCAN(
+    //       i_kRearLeftDriveMotorPort,
+    //       i_kRearLeftTurningMotorPort,
+    //       i_kRearLeftEncoderCan,
+    //       i_BACK_LEFT_ANGLE_OFFSET);
 
-    //  private final SwerveModule m_frontRight =
-    //   new SwerveModule(
-    //       kFrontRightDriveMotorPort,
-    //       kFrontRightTurningMotorPort,
-    //       1,
-    //       FRONT_RIGHT_ANGLE_OFFSET);
+    //  private final SwerveModuleCAN m_frontRight =
+    //   new SwerveModuleCAN(
+    //       i_kFrontRightDriveMotorPort,
+    //       i_kFrontRightTurningMotorPort,
+    //       i_kFrontRightEncoderCan,
+    //       i_FRONT_RIGHT_ANGLE_OFFSET);
 
-    // private final SwerveModule m_rearRight =
-    //   new SwerveModule(
-    //       kRearRightDriveMotorPort,
-    //       kRearRightTurningMotorPort,
-    //       3,
-    //       BACK_RIGHT_ANGLE_OFFSET);
+    // private final SwerveModuleCAN m_rearRight =
+    //   new SwerveModuleCAN(
+    //       i_kRearRightDriveMotorPort,
+    //       i_kRearRightTurningMotorPort,
+    //       i_kRearRightEncoderCan,
+    //       i_BACK_RIGHT_ANGLE_OFFSET);
+
+         private final SwerveModule m_frontLeft =
+      new SwerveModule(
+          i_kFrontLeftDriveMotorPort,
+          i_kFrontLeftTurningMotorPort,
+          0,
+          i_FRONT_LEFT_ANGLE_OFFSET);
+
+     private final SwerveModule m_rearLeft =
+      new SwerveModule(
+          kRearLeftDriveMotorPort,
+          kRearLeftTurningMotorPort,
+          2,
+          BACK_LEFT_ANGLE_OFFSET);
+
+     private final SwerveModule m_frontRight =
+      new SwerveModule(
+          kFrontRightDriveMotorPort,
+          kFrontRightTurningMotorPort,
+          1,
+          FRONT_RIGHT_ANGLE_OFFSET);
+
+    private final SwerveModule m_rearRight =
+      new SwerveModule(
+          kRearRightDriveMotorPort,
+          kRearRightTurningMotorPort,
+          3,
+          BACK_RIGHT_ANGLE_OFFSET);
 
   // Robot swerve modules
 
