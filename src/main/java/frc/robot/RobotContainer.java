@@ -16,7 +16,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.RunInfeedMotor;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Infeed;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -32,11 +34,13 @@ import java.util.List;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final DriveSubsystem m_robotDrive = DriveSubsystem.get_instance();
+  private final Infeed m_infeed = Infeed.get_instance();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
+  JoystickButton _start = new JoystickButton(m_driverController, XboxController.Button.kStart.value);
   JoystickButton _a = new JoystickButton(m_driverController, XboxController.Button.kA.value);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -45,17 +49,17 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
-    m_robotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        new RunCommand(
-            () ->
-                m_robotDrive.drive(
-                    util.deadband(-m_driverController.getLeftY()),
-                    util.deadband(-m_driverController.getLeftX()),
-                    util.deadband(-m_driverController.getRightX()),
-                    false),
-            m_robotDrive));
+    // m_robotDrive.setDefaultCommand(
+    //     // The left stick controls translation of the robot.
+    //     // Turning is controlled by the X axis of the right stick.
+    //     new RunCommand(
+    //         () ->
+    //             m_robotDrive.drive(
+    //                 util.deadband(-m_driverController.getLeftY()),
+    //                 util.deadband(-m_driverController.getLeftX()),
+    //                 util.deadband(-m_driverController.getRightX()),
+    //                 false),
+    //         m_robotDrive));
   }
 
   /**
@@ -65,7 +69,8 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-      _a.whenPressed(new InstantCommand(() -> m_robotDrive.zeroHeading()));
+      _start.whenPressed(new InstantCommand(() -> m_robotDrive.zeroHeading()));
+      _a.toggleWhenPressed(new RunInfeedMotor());
   }
 
   /**
