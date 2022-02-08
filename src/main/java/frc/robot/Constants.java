@@ -109,7 +109,7 @@ public final class Constants {
         // Assumes the encoders are on a 1:1 reduction with the module shaft.
         (2 * Math.PI) / (double) i_kEncoderCPR;
 
-    public static final double i_kPModuleTurningController = 0.5;
+    public static final double i_kPModuleTurningController = 0.1;
 
     public static final double i_kPModuleDriveController = 0;
   }

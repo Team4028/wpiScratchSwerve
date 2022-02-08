@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
@@ -62,19 +63,24 @@ public class SwerveModuleCAN {
     m_driveMotor = new TalonFX(driveMotorChannel);
     m_turningMotor = new TalonFX(turningMotorChannel);
     m_turningEncoder = new CANCoder(CANEncoderPort);
-    this.turningMotorOffset = turningMotorOffset;
-    m_turningEncoder.setPositionToAbsolute();
-
-    //this.m_driveEncoder = new Encoder(driveEncoderPorts[0], driveEncoderPorts[1]);
+    m_turningEncoder.configFactoryDefault();
     m_driveMotor.configFactoryDefault();
     m_turningMotor.configFactoryDefault();
+    this.turningMotorOffset = turningMotorOffset;
+    m_turningEncoder.setPositionToAbsolute();
+    m_turningMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+    m_turningMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+    m_turningMotor.setSelectedSensorPosition((150/7) * 2048 * getTurningEncoderRadians() / (2 * Math.PI));
+    m_turningMotor.configFeedbackNotContinuous(false, 0);
+
+    //this.m_driveEncoder = new Encoder(driveEncoderPorts[0], driveEncoderPorts[1]);
+
     m_driveMotor.setNeutralMode(NeutralMode.Brake);
-    m_turningMotor.setNeutralMode(NeutralMode.Brake);
+    m_turningMotor.setNeutralMode(NeutralMode.Coast);
     m_turningMotor.setInverted(true);
+
+    configMotorPID(m_turningMotor, 0, MK4IModuleConstants.i_kPModuleTurningController/1.75, 0.0, 0.0);
   
-    // m_turningMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-    // m_turningMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
-    // m_turningMotor.config_kP(0, MK4IModuleConstants.i_kPModuleTurningController);
 
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
@@ -82,7 +88,7 @@ public class SwerveModuleCAN {
   }
 
   private double getTurningEncoderRadians(){
-    double angle = m_turningEncoder.getAbsolutePosition() + turningMotorOffset;
+    double angle = Math.toRadians(m_turningEncoder.getAbsolutePosition()) + turningMotorOffset;
     angle %= 2.0 * Math.PI;
     if (angle < 0.0) {
         angle += 2.0 * Math.PI;
@@ -118,8 +124,21 @@ public class SwerveModuleCAN {
         m_turningPIDController.calculate(getTurningEncoderRadians(), state.angle.getRadians());
 
     // Calculate the turning motor output from the turning PID controller.
+    m_turningMotor.setSelectedSensorPosition((150/7) * 2048 * getTurningEncoderRadians() / (2 * Math.PI));
+
+    final int wrap = 2048 * (150/7); // in encoder counts
+    final int current = (int) m_turningMotor.getSelectedSensorPosition(0);
+    final int desired = (int) Math.round(state.angle.getDegrees() * wrap / 360.0);
+    final int newPosition = (int) minChange(desired, current, wrap / 2.0) + current;
+
     m_driveMotor.set(ControlMode.PercentOutput, driveOutput);
-    m_turningMotor.set(ControlMode.PercentOutput, turnOutput);
+    m_turningMotor.set(ControlMode.Position, newPosition);
+  }
+
+  public void configMotorPID(TalonFX talon, int slotIdx, double p, double i, double d){
+    talon.config_kP(slotIdx, p);
+    talon.config_kI(slotIdx, i);
+    talon.config_kD(slotIdx, d);
   }
 
   /** Zeros all the SwerveModule encoders. */
@@ -127,4 +146,27 @@ public class SwerveModuleCAN {
     m_driveEncoder.reset();
     m_turningEncoder.reset();
   }*/
+
+public double mod(double a, double b){
+  var r = a % b;
+  if (r < 0) {
+      r += b;
+  }
+  return r;
+}
+public double minChange(double a, double b, double wrap){
+  return halfMod(a - b, wrap);
+}
+
+/**
+* @return a value in range `[-wrap / 2, wrap / 2)` where `mod(a, wrap) == mod(value, wrap)`
+*/
+public double halfMod(double a, double wrap) {
+  double aa = mod(a, wrap);
+  double halfWrap = wrap / 2.0;
+  if(aa >= halfWrap){
+      aa -= wrap;
+  }
+  return aa;
+}
 }
