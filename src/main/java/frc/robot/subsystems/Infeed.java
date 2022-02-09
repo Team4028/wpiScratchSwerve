@@ -8,24 +8,24 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Infeed extends SubsystemBase {
   /** Creates a new Infeed. */
-  private TalonSRX infeedMotor;
-
-  private static Infeed _instance;
-  public static final Infeed get_instance(){
-    if (_instance == null){
-      _instance = new Infeed();
-    }
+  private TalonSRX _MotorInfeedOne;
+  private static Infeed _instance = new Infeed();
+  public static Infeed get_instance() {
     return _instance;
   }
 
   public Infeed() {
-    infeedMotor = new TalonSRX(8);
+    //_MotorInfeedOne = new TalonSRX(Constants.INFEED_MOTOR_ID);
+    
+    
   }
-  public void runInfeedMotor(double percentoutput){
-    infeedMotor.set(ControlMode.PercentOutput, percentoutput);
+
+  public void runMotorInfeed(){
+   // _MotorInfeedOne.set(ControlMode.PercentOutput, .1);
   }
 
   @Override

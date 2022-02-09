@@ -16,7 +16,11 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.RunInfeedMotor;
+import frc.robot.commands.RunWithEncoder;
+import frc.robot.commands.ShootOneBall;
+import frc.robot.commands.ShootTwoBalls;
+import frc.robot.commands.ToggleFiveAndSix;
+import frc.robot.commands.ToggleOneAndTwo;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Infeed;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -69,7 +73,11 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
       m_driverController.start.whenPressed(new InstantCommand(() -> m_robotDrive.zeroHeading()));
-      m_driverController.a.toggleWhenPressed(new RunInfeedMotor());
+      m_operatorController.y.toggleWhenPressed(new ToggleOneAndTwo());
+      m_operatorController.b.whenPressed(new RunWithEncoder());
+      m_operatorController.x.toggleWhenPressed(new ToggleFiveAndSix());
+      m_operatorController.a.whenPressed(new ShootTwoBalls());
+      m_operatorController.back.toggleWhenPressed(new ShootOneBall());
   }
 
   /**

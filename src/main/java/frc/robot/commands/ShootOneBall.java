@@ -5,29 +5,32 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Infeed;
+import frc.robot.subsystems.TestingEther;
 
-public class RunInfeedMotor extends CommandBase {
-  /** Creates a new RunInfeedMotor. */
-  public RunInfeedMotor() {
+public class ShootOneBall extends CommandBase {
+  private TestingEther _TesEth = TestingEther.get_instance();
+  /** Creates a new ToggleThree. */
+  public ShootOneBall() {
+    addRequirements(_TesEth);
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(Infeed.get_instance());
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Infeed.get_instance().runInfeedMotor(0.7);
+    _TesEth.runThree();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    _TesEth.runThree();
+  }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    Infeed.get_instance().runInfeedMotor(0);
+    _TesEth.stopThree();
   }
 
   // Returns true when the command should end.
