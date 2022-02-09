@@ -7,31 +7,31 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.TestingEther;
 
-public class ShootOneBall extends CommandBase {
-  private TestingEther _TesEth = TestingEther.get_instance();
-  /** Creates a new ToggleThree. */
-  public ShootOneBall() {
-    addRequirements(_TesEth);
+public class RunConveyorWithEncoder extends CommandBase {
+  private TestingEther _TE = TestingEther.get_instance();
+  /** Creates a new RunWithEncoder. */
+  public RunConveyorWithEncoder() {
+    addRequirements(_TE);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    _TesEth.runThree();
+    _TE.runConveyorMotorWithEncoder(20, 0.2);
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    _TesEth.runThree();
+    _TE.runConveyorMotorWithEncoder(20, 0.2);
+    
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    _TesEth.stopThree();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

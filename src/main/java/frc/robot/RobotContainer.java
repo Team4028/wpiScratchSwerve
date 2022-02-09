@@ -16,11 +16,11 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.RunWithEncoder;
-import frc.robot.commands.ShootOneBall;
-import frc.robot.commands.ShootTwoBalls;
-import frc.robot.commands.ToggleFiveAndSix;
-import frc.robot.commands.ToggleOneAndTwo;
+import frc.robot.commands.RunConveyorWithEncoder;
+import frc.robot.commands.RunConveyorOneBall;
+import frc.robot.commands.RunConveyorTwoBall;
+import frc.robot.commands.RunShooterMotors;
+import frc.robot.commands.RunInfeedSingulatorMotors;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Infeed;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -73,11 +73,11 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
       m_driverController.start.whenPressed(new InstantCommand(() -> m_robotDrive.zeroHeading()));
-      m_operatorController.y.toggleWhenPressed(new ToggleOneAndTwo());
-      m_operatorController.b.whenPressed(new RunWithEncoder());
-      m_operatorController.x.toggleWhenPressed(new ToggleFiveAndSix());
-      m_operatorController.a.whenPressed(new ShootTwoBalls());
-      m_operatorController.back.toggleWhenPressed(new ShootOneBall());
+      m_operatorController.y.toggleWhenPressed(new RunInfeedSingulatorMotors());
+      m_operatorController.b.whenPressed(new RunConveyorWithEncoder());
+      m_operatorController.x.toggleWhenPressed(new RunShooterMotors());
+      m_operatorController.a.whenPressed(new RunConveyorTwoBall());
+      m_operatorController.back.toggleWhenPressed(new RunConveyorOneBall());
   }
 
   /**

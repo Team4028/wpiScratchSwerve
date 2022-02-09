@@ -72,10 +72,10 @@ public class DriveSubsystem extends SubsystemBase {
 
          private final SwerveModule m_frontLeft =
       new SwerveModule(
-          i_kFrontLeftDriveMotorPort,
-          i_kFrontLeftTurningMotorPort,
+          kFrontLeftDriveMotorPort,
+          kFrontLeftTurningMotorPort,
           0,
-          i_FRONT_LEFT_ANGLE_OFFSET);
+          FRONT_LEFT_ANGLE_OFFSET);
 
      private final SwerveModule m_rearLeft =
       new SwerveModule(

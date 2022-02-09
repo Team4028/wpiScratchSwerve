@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
@@ -20,8 +21,8 @@ public class TestingEther extends SubsystemBase {
   private CANSparkMax _singulatorMotor;
   private CANSparkMax _conveyorMotor; // needs to be reversed
 
-  private TalonFX _MotorFive;
-  private TalonFX _MotorSix;
+  private TalonFX _shooterMotorOne;
+  private TalonFX _shooterMotorTwo;
 
   private RelativeEncoder _enc;
   private static TestingEther _instance = new TestingEther();
@@ -35,8 +36,10 @@ public class TestingEther extends SubsystemBase {
   _singulatorMotor = new CANSparkMax(SubsystemConstants.SINGULATOR_MOTOR_ID, MotorType.kBrushless);
   _conveyorMotor = new CANSparkMax(SubsystemConstants.CONVEYOR_MOTOR_ID, MotorType.kBrushless);
 
-  _MotorFive = new TalonFX(5);
-  _MotorSix = new TalonFX(6);
+  _shooterMotorOne = new TalonFX(SubsystemConstants.SHOOTER_1_MOTOR_ID);
+  _shooterMotorTwo = new TalonFX(SubsystemConstants.SHOOTER_2_MOTOR_ID);
+
+  _shooterMotorTwo.setInverted(InvertType.InvertMotorOutput);
 
     _enc = _conveyorMotor.getEncoder();
     _enc.setPosition(0);
@@ -45,26 +48,26 @@ public class TestingEther extends SubsystemBase {
  
   }
 
-  public void runMotorOneAndTwo(){
+  public void runInfeedSingulatorMotors(){
     _infeedMotor.set(ControlMode.PercentOutput, .6);
     _singulatorMotor.set(.6);
   }
 
-  public void runThree(){
+  public void runConveyorMotor(){
     _conveyorMotor.set(0.5);
   }
 
-  public void stopThree(){
+  public void stopConveyorMotor(){
     _conveyorMotor.set(0);
   }
 
-  public void stopTwoThree(){
+  public void stopInfeedSingulatorConveyorMotors(){
     _infeedMotor.set(ControlMode.PercentOutput, 0);
     _singulatorMotor.set(0);
     _conveyorMotor.set(0);
   }
 
-  public void runMotorWithEncoder(double target, double vbus){
+  public void runConveyorMotorWithEncoder(double target, double vbus){
     if (_enc.getPosition()<target)
     {
       _conveyorMotor.set(0);
@@ -79,14 +82,14 @@ public class TestingEther extends SubsystemBase {
 
   
 
-  public void runFiveSix(){
-    _MotorFive.set(ControlMode.PercentOutput, .4);
-    _MotorSix.set(ControlMode.PercentOutput, .6);
+  public void runShooterMotors(){
+    _shooterMotorOne.set(ControlMode.PercentOutput, .47);
+    _shooterMotorTwo.set(ControlMode.PercentOutput, .67);
   }
 
-  public void stopFiveSix(){
-    _MotorFive.set(ControlMode.PercentOutput, 0);
-    _MotorSix.set(ControlMode.PercentOutput, 0);
+  public void stopShooterMotors(){
+    _shooterMotorOne.set(ControlMode.PercentOutput, 0);
+    _shooterMotorTwo.set(ControlMode.PercentOutput, 0);
   }
 
 
