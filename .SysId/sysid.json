@@ -1,0 +1,11 @@
+{
+  "SysId": {
+    "Analysis Type": "General Mechanism",
+    "AnalyzerJSONLocation": "C:\\Users\\wruet\\Documents\\GitHub\\sysid_data20220207-175542.json",
+    "NetworkTables Settings": {
+      "serverTeam": "4028"
+    },
+    "mode": "Client",
+    "serverTeam": "172.22.11.2"
+  }
+}

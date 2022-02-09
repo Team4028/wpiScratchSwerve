@@ -37,11 +37,10 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = DriveSubsystem.get_instance();
   private final Infeed m_infeed = Infeed.get_instance();
 
-  // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-
-  JoystickButton _start = new JoystickButton(m_driverController, XboxController.Button.kStart.value);
-  JoystickButton _a = new JoystickButton(m_driverController, XboxController.Button.kA.value);
+  // Controller Setup
+  private BeakXBoxController m_driverController = new BeakXBoxController(0);
+  private BeakXBoxController m_operatorController = new BeakXBoxController(OIConstants.kOperatorControllerPort);
+  //---
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -49,17 +48,17 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
-    // m_robotDrive.setDefaultCommand(
-    //     // The left stick controls translation of the robot.
-    //     // Turning is controlled by the X axis of the right stick.
-    //     new RunCommand(
-    //         () ->
-    //             m_robotDrive.drive(
-    //                 util.deadband(-m_driverController.getLeftY()),
-    //                 util.deadband(-m_driverController.getLeftX()),
-    //                 util.deadband(-m_driverController.getRightX()),
-    //                 false),
-    //         m_robotDrive));
+    m_robotDrive.setDefaultCommand(
+        // The left stick controls translation of the robot.
+        // Turning is controlled by the X axis of the right stick.
+        new RunCommand(
+            () ->
+                m_robotDrive.drive(
+                    util.deadband(-m_driverController.getLeftYAxis()),
+                    util.deadband(-m_driverController.getLeftXAxis()),
+                    util.deadband(-m_driverController.getRightXAxis()),
+                    false),
+            m_robotDrive));
   }
 
   /**
@@ -69,8 +68,8 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-      _start.whenPressed(new InstantCommand(() -> m_robotDrive.zeroHeading()));
-      _a.toggleWhenPressed(new RunInfeedMotor());
+      m_driverController.start.whenPressed(new InstantCommand(() -> m_robotDrive.zeroHeading()));
+      m_driverController.a.toggleWhenPressed(new RunInfeedMotor());
   }
 
   /**
