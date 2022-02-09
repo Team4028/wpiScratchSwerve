@@ -28,11 +28,6 @@ public class DriveSubsystem extends SubsystemBase {
   private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(314.6);//60.6);//60.7
   private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(70.9);//60.3);//60.7
 
-  // private  SwerveModule m_frontLeft;
-  // private  SwerveModule m_frontRight;
-  // private  SwerveModule m_rearLeft;
-  // private  SwerveModule m_rearRight;
-
 
   private static final double i_FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(204.6);//0.0);//60.6);//60.7
   private static final double i_FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(204.2);//141.2);//139.1
@@ -173,7 +168,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
     System.out.println(swerveModuleStates[0].speedMetersPerSecond);
-    //bruhtestmoment
   }
 
   /**
@@ -189,14 +183,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.setDesiredState(desiredStates[2]);
     m_rearRight.setDesiredState(desiredStates[3]);
   }
-
-  /** Resets the drive encoders to currently read a position of 0. */
-  // public void resetEncoders() {
-  //   m_frontLeft.resetEncoders();
-  //   m_rearLeft.resetEncoders();
-  //   m_frontRight.resetEncoders();
-  //   m_rearRight.resetEncoders();
-  // }
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {

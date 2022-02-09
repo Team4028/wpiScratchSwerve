@@ -47,9 +47,9 @@ public final class Constants {
     public static final int i_kRearRightEncoderCan = 4;
 
 
-    public static final double kTrackWidth = util.inchesToMeters(23.75);
+    public static final double kTrackWidth = MK4I? util.inchesToMeters(23.75): util.inchesToMeters(23.5);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = util.inchesToMeters(25.75);
+    public static final double kWheelBase = MK4I? util.inchesToMeters(25.75): util.inchesToMeters(21.5);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics =
         new SwerveDriveKinematics(
@@ -58,7 +58,7 @@ public final class Constants {
             new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
             new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-    public static final boolean kGyroReversed = true; //true for mk2 chassis
+    public static final boolean kGyroReversed = !MK4I; //true for mk2 chassis
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
@@ -68,8 +68,7 @@ public final class Constants {
     public static final double kvVoltSecondsPerMeter = 0;
     public static final double kaVoltSecondsSquaredPerMeter = 0;
 
-    public static final double kMaxSpeedMetersPerSecond = util.feetToMeters(12.0);
-    public static final double i_kMaxSpeedMetersPerSecond = util.feetToMeters(16.3);
+    public static final double kMaxSpeedMetersPerSecond = MK4I? util.feetToMeters(16.3):util.feetToMeters(12.0);
   }
 
   public static final class ModuleConstants {
@@ -131,4 +130,24 @@ public final class Constants {
         new TrapezoidProfile.Constraints(
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
+
+  public static final class SubsystemConstants {
+    /*************** CAN IDS **************/
+
+    //0-8 will be alotted for swerve motors
+    //9-12 will be alotted and encoders
+
+    public static final int INFEED_MOTOR_ID = 13;
+    public static final int SINGULATOR_MOTOR_ID = 14;
+    public static final int CONVEYOR_MOTOR_ID = 15;
+    public static final int KICKER_MOTOR_ID = 16;
+    public static final int SHOOTER_1_MOTOR_ID = 17;
+    public static final int SHOOTER_2_MOTOR_ID = 18;
+
+    public static final int CLIMB_MOTOR_ID = 19;
+
+    public static final int TOF1_SENSOR_ID = 420;
+    public static final int TOF2_SENSOR_ID = 69;
+  }
+
 }
