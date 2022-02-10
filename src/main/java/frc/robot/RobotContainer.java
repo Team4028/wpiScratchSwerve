@@ -23,6 +23,7 @@ import frc.robot.commands.RunShooterMotors;
 import frc.robot.commands.RunInfeedSingulatorMotors;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Infeed;
+import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -40,6 +41,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = DriveSubsystem.get_instance();
   private final Infeed m_infeed = Infeed.get_instance();
+  private final Shooter m_shooter = Shooter.get_instance();
 
   // Controller Setup
   private BeakXBoxController m_driverController = new BeakXBoxController(0);
@@ -78,6 +80,8 @@ public class RobotContainer {
       m_operatorController.x.toggleWhenPressed(new RunShooterMotors());
       m_operatorController.a.whenPressed(new RunConveyorTwoBall());
       m_operatorController.back.toggleWhenPressed(new RunConveyorOneBall());
+      m_operatorController.right_bumper.whenPressed(new InstantCommand(() -> m_shooter.shiftShooterVbus(0, 0.02)));
+      m_operatorController.left_bumper.whenPressed(new InstantCommand(() -> m_shooter.shiftShooterVbus(0.02, 0)));
   }
 
   /**

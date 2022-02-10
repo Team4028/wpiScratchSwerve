@@ -167,7 +167,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
-    System.out.println(swerveModuleStates[0].speedMetersPerSecond);
+    //System.out.println(swerveModuleStates[0].speedMetersPerSecond);
   }
 
   /**

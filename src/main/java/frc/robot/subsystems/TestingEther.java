@@ -21,8 +21,9 @@ public class TestingEther extends SubsystemBase {
   private CANSparkMax _singulatorMotor;
   private CANSparkMax _conveyorMotor; // needs to be reversed
 
-  private TalonFX _shooterMotorOne;
-  private TalonFX _shooterMotorTwo;
+  // private TalonFX _shooterMotorOne;
+  // private TalonFX _shooterMotorTwo;
+  private boolean isTargetReached = false;
 
   private RelativeEncoder _enc;
   private static TestingEther _instance = new TestingEther();
@@ -36,10 +37,10 @@ public class TestingEther extends SubsystemBase {
   _singulatorMotor = new CANSparkMax(SubsystemConstants.SINGULATOR_MOTOR_ID, MotorType.kBrushless);
   _conveyorMotor = new CANSparkMax(SubsystemConstants.CONVEYOR_MOTOR_ID, MotorType.kBrushless);
 
-  _shooterMotorOne = new TalonFX(SubsystemConstants.SHOOTER_1_MOTOR_ID);
-  _shooterMotorTwo = new TalonFX(SubsystemConstants.SHOOTER_2_MOTOR_ID);
+  // _shooterMotorOne = new TalonFX(SubsystemConstants.SHOOTER_1_MOTOR_ID);
+  // _shooterMotorTwo = new TalonFX(SubsystemConstants.SHOOTER_2_MOTOR_ID);
 
-  _shooterMotorTwo.setInverted(InvertType.InvertMotorOutput);
+  // _shooterMotorTwo.setInverted(InvertType.InvertMotorOutput);
 
     _enc = _conveyorMotor.getEncoder();
     _enc.setPosition(0);
@@ -49,12 +50,12 @@ public class TestingEther extends SubsystemBase {
   }
 
   public void runInfeedSingulatorMotors(){
-    _infeedMotor.set(ControlMode.PercentOutput, .6);
-    _singulatorMotor.set(.6);
+    _infeedMotor.set(ControlMode.PercentOutput, .3);
+    _singulatorMotor.set(.3);
   }
 
   public void runConveyorMotor(){
-    _conveyorMotor.set(0.5);
+    _conveyorMotor.set(0.7);
   }
 
   public void stopConveyorMotor(){
@@ -68,9 +69,11 @@ public class TestingEther extends SubsystemBase {
   }
 
   public void runConveyorMotorWithEncoder(double target, double vbus){
-    if (_enc.getPosition()<target)
+    isTargetReached = false;
+    if (_enc.getPosition()>target)
     {
       _conveyorMotor.set(0);
+      isTargetReached = true;
     }
     else{
       _conveyorMotor.set(vbus);
@@ -82,15 +85,22 @@ public class TestingEther extends SubsystemBase {
 
   
 
-  public void runShooterMotors(){
-    _shooterMotorOne.set(ControlMode.PercentOutput, .47);
-    _shooterMotorTwo.set(ControlMode.PercentOutput, .67);
+  // public void runShooterMotors(){
+  //   _shooterMotorOne.set(ControlMode.PercentOutput, .47);
+  //   _shooterMotorTwo.set(ControlMode.PercentOutput, .67);
+  // }
+
+  // public void stopShooterMotors(){
+  //   _shooterMotorOne.set(ControlMode.PercentOutput, 0);
+  //   _shooterMotorTwo.set(ControlMode.PercentOutput, 0);
+  // }
+  public void resetEncoder(){
+    _enc.setPosition(0);
   }
 
-  public void stopShooterMotors(){
-    _shooterMotorOne.set(ControlMode.PercentOutput, 0);
-    _shooterMotorTwo.set(ControlMode.PercentOutput, 0);
-  }
+  public boolean getIsTargetReached(){
+    return isTargetReached;
+  }//tempmethod
 
 
   @Override

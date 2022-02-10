@@ -5,32 +5,33 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.TestingEther;
 
 public class RunShooterMotors extends CommandBase {
-  private TestingEther _TEther = TestingEther.get_instance();
+  private Shooter _shooter = Shooter.get_instance();
   /** Creates a new ToggleFiveAndSix. */
   public RunShooterMotors() {
-  addRequirements(_TEther);
+  addRequirements(Shooter.get_instance());
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    _TEther.runShooterMotors();
+    _shooter.runShooterMotors();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    _TEther.runShooterMotors();
+    _shooter.runShooterMotors();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    _TEther.stopShooterMotors();
+    _shooter.stopShooterMotors();
   }
 
   // Returns true when the command should end.

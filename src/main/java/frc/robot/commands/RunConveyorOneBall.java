@@ -31,6 +31,7 @@ public class RunConveyorOneBall extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     _TesEth.stopConveyorMotor();
+    _TesEth.resetEncoder();
   }
 
   // Returns true when the command should end.
