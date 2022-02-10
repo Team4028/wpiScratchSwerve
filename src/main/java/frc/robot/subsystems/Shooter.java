@@ -15,8 +15,8 @@ public class Shooter extends SubsystemBase {
   /** Creates a new Shooter. */
   private TalonFX _frontMotor;
   private TalonFX _backMotor;
-  private double shooterFrontVbus = .50;
-  private double shooterBackVbus = 0.7;
+  private double shooterFrontVbus = .47;
+  private double shooterBackVbus = 0.70; //replaced temporarily
 
   private static Shooter _instance;
   public static Shooter get_instance(){
@@ -35,7 +35,7 @@ public class Shooter extends SubsystemBase {
 
   public void runShooterMotors(){
     _frontMotor.set(ControlMode.PercentOutput, shooterFrontVbus);
-    _backMotor.set(ControlMode.PercentOutput, shooterBackVbus);//.67);
+    _backMotor.set(ControlMode.PercentOutput, 1.3 * shooterFrontVbus);//.67);
   }
 
   public void stopShooterMotors(){
@@ -44,8 +44,8 @@ public class Shooter extends SubsystemBase {
   }
 
   public void shiftShooterVbus(double frontshift, double backshift){
-    shooterBackVbus += backshift;
-    shooterFrontVbus += frontshift;
+    // shooterBackVbus += backshift;
+    // shooterFrontVbus += frontshift;
   }
 
   @Override
