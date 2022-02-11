@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import java.util.NavigableMap;
 
+import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,6 +18,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
 import frc.robot.util;
+import frc.robot.Constants.DriveConstants;
+
 import static frc.robot.Constants.DriveConstants.*;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -106,14 +110,18 @@ public class DriveSubsystem extends SubsystemBase {
   // Robot swerve modules
 
   // The gyro sensor
-  private final Gyro m_gyro = new AHRS(SPI.Port.kMXP);
+  // private final Pigeon2 m_pigeon = new Pigeon2(1);
+  private final Gyro m_gyro = DriveConstants.isNAVX? new AHRS(SPI.Port.kMXP): new WPI_Pigeon2(DriveConstants.pigeonCan);
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry =
       new SwerveDriveOdometry(kDriveKinematics, m_gyro.getRotation2d());
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {  }
+  public DriveSubsystem() {
+    // m_pigeon.configFactoryDefault();
+    // m_pigeon.configDisableTemperatureCompensation(false);
+  }
 
   @Override
   public void periodic() {

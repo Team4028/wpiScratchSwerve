@@ -20,6 +20,7 @@ public final class Constants {
   public static final class DriveConstants {
 
     public static final boolean MK4I = true;
+    public static final boolean isNAVX = false;
 
     public static final int kFrontLeftDriveMotorPort = 1;
     public static final int kRearLeftDriveMotorPort = 6;
@@ -45,6 +46,8 @@ public final class Constants {
     public static final int i_kRearLeftEncoderCan = 3;
     public static final int i_kFrontRightEncoderCan = 2;
     public static final int i_kRearRightEncoderCan = 4;
+
+    public static final int pigeonCan = 1;
 
 
     public static final double kTrackWidth = util.inchesToMeters(23.75);
