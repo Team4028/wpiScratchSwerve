@@ -14,7 +14,7 @@ public final class util {
         return feet / 3.281;
     }
     public static double deadband(double input){
-        return Math.abs(input) < 0.025? 0.0:input / 10;
+        return Math.abs(input) < 0.025? 0.0:input;
     }
     public static double metersToFeet(double meters){
         return meters * 3.281;

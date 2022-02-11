@@ -47,7 +47,7 @@ public class SwerveModuleCAN {
   private final PIDController m_drivePIDController =
       new PIDController(0.0, 0, 0);
 
-  private final PIDController m_turningPIDController = new PIDController(MK4IModuleConstants.i_kPModuleTurningController, 0, 0.0);
+  private final PIDController m_turningPIDController = new PIDController(0.5, 0, 0.0);
 
   /**
    * Constructs a SwerveModule.
@@ -76,10 +76,10 @@ public class SwerveModuleCAN {
     //this.m_driveEncoder = new Encoder(driveEncoderPorts[0], driveEncoderPorts[1]);
 
     m_driveMotor.setNeutralMode(NeutralMode.Brake);
-    m_turningMotor.setNeutralMode(NeutralMode.Coast);
+    m_turningMotor.setNeutralMode(NeutralMode.Brake);
     m_turningMotor.setInverted(true);
 
-    configMotorPID(m_turningMotor, 0, MK4IModuleConstants.i_kPModuleTurningController/1.75, 0.0, 0.0);
+    configMotorPID(m_turningMotor, 0, MK4IModuleConstants.i_kPModuleTurningController, 0.0, 0.0);
   
 
     // Limit the PID Controller's input range between -pi and pi and set the input
@@ -124,7 +124,7 @@ public class SwerveModuleCAN {
         m_turningPIDController.calculate(getTurningEncoderRadians(), state.angle.getRadians());
 
     // Calculate the turning motor output from the turning PID controller.
-    m_turningMotor.setSelectedSensorPosition((150/7) * 2048 * getTurningEncoderRadians() / (2 * Math.PI));
+    //m_turningMotor.setSelectedSensorPosition((150/7) * 2048 * getTurningEncoderRadians() / (2 * Math.PI));
 
     final int wrap = 2048 * (150/7); // in encoder counts
     final int current = (int) m_turningMotor.getSelectedSensorPosition(0);
