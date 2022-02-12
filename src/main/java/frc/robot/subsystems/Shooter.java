@@ -10,13 +10,12 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SubsystemConstants;
+import frc.robot.Constants.VBusConstants;
 
 public class Shooter extends SubsystemBase {
   /** Creates a new Shooter. */
   private TalonFX _frontMotor;
   private TalonFX _backMotor;
-  private double shooterFrontVbus = .47;
-  private double shooterBackVbus = 0.70; //replaced temporarily
 
   private static Shooter _instance;
   public static Shooter get_instance(){
@@ -34,8 +33,8 @@ public class Shooter extends SubsystemBase {
   }
 
   public void runShooterMotors(){
-    _frontMotor.set(ControlMode.PercentOutput, shooterFrontVbus);
-    _backMotor.set(ControlMode.PercentOutput, 1.3 * shooterFrontVbus);//.67);
+    _frontMotor.set(ControlMode.PercentOutput, VBusConstants.kShooterFront);
+    _backMotor.set(ControlMode.PercentOutput, VBusConstants.kShooterBack);//.67);
   }
 
   public void stopShooterMotors(){

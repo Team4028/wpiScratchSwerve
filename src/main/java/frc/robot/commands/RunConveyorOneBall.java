@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.VBusConstants;
 import frc.robot.subsystems.TestingEther;
 
 public class RunConveyorOneBall extends CommandBase {
@@ -18,13 +19,13 @@ public class RunConveyorOneBall extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    _TesEth.runConveyorMotor();
+    _TesEth.runConveyorMotor(VBusConstants.kConveyAll);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    _TesEth.runConveyorMotor();
+    _TesEth.runConveyorMotor(VBusConstants.kConveyAll);
   }
 
   // Called once the command ends or is interrupted.

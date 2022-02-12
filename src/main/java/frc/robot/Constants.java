@@ -144,10 +144,27 @@ public final class Constants {
     public static final int SHOOTER_FRONT_MOTOR_ID = 17;
     public static final int SHOOTER_BACK_MOTOR_ID = 18;
 
-    public static final int CLIMB_MOTOR_ID = 19;
+    public static final int CLIMB_MOTOR_ID = 19; // this might need two motors
 
     public static final int TOF1_SENSOR_ID = 420;
     public static final int TOF2_SENSOR_ID = 69;
+  }
+
+  public static final class VBusConstants {
+    public static final double kConveyAll = 0.5; // op back
+    public static final double kConveyOne = 0.5; // op b
+    public static final double kConveyTwo = 0.5; // op a
+
+    public static final double kInfeed = 0.6; // op y
+    public static final double kSingulator = 0.5; // op y
+
+    public static final double kShooterFront = 0.47; // op x
+    public static final double kShooterBack = 1.3 * .47; // .7 // op x
+  }
+
+  public static final class EncoderConstants {
+    public static final double kConveyOne = 20.;
+    public static final double kConveyTwo = 50.;
   }
 
 }

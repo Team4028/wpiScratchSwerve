@@ -12,8 +12,11 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.hal.simulation.ConstBufferCallback;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.SubsystemConstants;
+import frc.robot.Constants.VBusConstants;
 
 public class TestingEther extends SubsystemBase {
   /** Creates a new TestingEther. */
@@ -50,12 +53,12 @@ public class TestingEther extends SubsystemBase {
   }
 
   public void runInfeedSingulatorMotors(){
-    _infeedMotor.set(ControlMode.PercentOutput, .3);
-    _singulatorMotor.set(.3);
+    _infeedMotor.set(ControlMode.PercentOutput, VBusConstants.kInfeed);
+    _singulatorMotor.set(VBusConstants.kSingulator);
   }
 
-  public void runConveyorMotor(){
-    _conveyorMotor.set(0.7);
+  public void runConveyorMotor(double vbus){
+    _conveyorMotor.set(vbus);
   }
 
   public void stopConveyorMotor(){

@@ -5,6 +5,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.EncoderConstants;
+import frc.robot.Constants.VBusConstants;
 import frc.robot.subsystems.TestingEther;
 
 public class RunConveyorWithEncoder extends CommandBase {
@@ -18,14 +20,14 @@ public class RunConveyorWithEncoder extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    _TE.runConveyorMotorWithEncoder(20, 0.5);
+    _TE.runConveyorMotorWithEncoder(EncoderConstants.kConveyOne, VBusConstants.kConveyOne);
     
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    _TE.runConveyorMotorWithEncoder(20, 0.5);
+    _TE.runConveyorMotorWithEncoder(EncoderConstants.kConveyOne, VBusConstants.kConveyOne);
     
   }
 
