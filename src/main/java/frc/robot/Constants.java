@@ -151,15 +151,15 @@ public final class Constants {
   }
 
   public static final class VBusConstants {
-    public static final double kConveyAll = 0.5; // op back
+    public static final double kConveyAll = 0.5; // op start
     public static final double kConveyOne = 0.5; // op b
     public static final double kConveyTwo = 0.5; // op a
 
     public static final double kInfeed = 0.6; // op y
     public static final double kSingulator = 0.5; // op y
 
-    public static final double kShooterFront = 0.47; // op x
-    public static final double kShooterBack = 1.3 * .47; // .7 // op x
+    public static final double kShooterFront = 0.69;//0.47; // op x
+    public static final double kShooterBack = 1.0 * kShooterFront; // .7 // op x
   }
 
   public static final class EncoderConstants {

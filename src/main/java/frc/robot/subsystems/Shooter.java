@@ -5,9 +5,12 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.revrobotics.EncoderType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SubsystemConstants;
 import frc.robot.Constants.VBusConstants;
@@ -28,13 +31,15 @@ public class Shooter extends SubsystemBase {
     _frontMotor = new TalonFX(SubsystemConstants.SHOOTER_FRONT_MOTOR_ID);
     _backMotor = new TalonFX(SubsystemConstants.SHOOTER_BACK_MOTOR_ID);
   
-    _backMotor.setInverted(InvertType.InvertMotorOutput);
-    
+    _backMotor.setInverted(InvertType.InvertMotorOutput);    
   }
 
   public void runShooterMotors(){
     _frontMotor.set(ControlMode.PercentOutput, VBusConstants.kShooterFront);
     _backMotor.set(ControlMode.PercentOutput, VBusConstants.kShooterBack);//.67);
+
+    SmartDashboard.putNumber("Front Motor RPM", _frontMotor.getSelectedSensorVelocity() * 600 / 4096);
+    SmartDashboard.putNumber("Back Motor RPM", _backMotor.getSelectedSensorVelocity() * 600 / 4096);
   }
 
   public void stopShooterMotors(){

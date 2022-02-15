@@ -52,9 +52,9 @@ public class TestingEther extends SubsystemBase {
  
   }
 
-  public void runInfeedSingulatorMotors(){
-    _infeedMotor.set(ControlMode.PercentOutput, VBusConstants.kInfeed);
-    _singulatorMotor.set(VBusConstants.kSingulator);
+  public void runInfeedSingulatorMotors(double mult){
+    _infeedMotor.set(ControlMode.PercentOutput, mult * VBusConstants.kInfeed);
+    _singulatorMotor.set(mult * VBusConstants.kSingulator);
   }
 
   public void runConveyorMotor(double vbus){

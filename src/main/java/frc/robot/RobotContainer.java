@@ -17,6 +17,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.RunConveyorWithEncoder;
+import frc.robot.commands.ReverseInfeedAndConveyor;
 import frc.robot.commands.RunConveyorOneBall;
 import frc.robot.commands.RunConveyorTwoBall;
 import frc.robot.commands.RunShooterMotors;
@@ -79,9 +80,10 @@ public class RobotContainer {
       m_operatorController.b.whenPressed(new RunConveyorWithEncoder());
       m_operatorController.x.toggleWhenPressed(new RunShooterMotors());
       m_operatorController.a.whenPressed(new RunConveyorTwoBall());
-      m_operatorController.back.toggleWhenPressed(new RunConveyorOneBall());
+      m_operatorController.start.toggleWhenPressed(new RunConveyorOneBall());
       m_operatorController.right_bumper.whenPressed(new InstantCommand(() -> m_shooter.shiftShooterVbus(0, 0.02)));
       m_operatorController.left_bumper.whenPressed(new InstantCommand(() -> m_shooter.shiftShooterVbus(0.02, 0)));
+      m_operatorController.back.toggleWhenPressed(new ReverseInfeedAndConveyor());
   }
 
   /**

@@ -5,33 +5,36 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.VBusConstants;
 import frc.robot.subsystems.TestingEther;
 
-public class RunInfeedSingulatorMotors extends CommandBase {
-  /** Creates a new ToggleOneAndTwo. */
-  private TestingEther _TestingEther = TestingEther.get_instance();
-  public RunInfeedSingulatorMotors() {
-    addRequirements(_TestingEther);
+public class ReverseInfeedAndConveyor extends CommandBase {
+  /** Creates a new ReverseInfeedAndConveyor. */
+  private TestingEther _eth = TestingEther.get_instance();
+  public ReverseInfeedAndConveyor() {
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(_eth);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    _TestingEther.runInfeedSingulatorMotors(1);
+    _eth.runConveyorMotor(-VBusConstants.kConveyAll);
+    _eth.runInfeedSingulatorMotors(-1);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    _TestingEther.runInfeedSingulatorMotors(1);
-    System.out.println("line");
+    _eth.runConveyorMotor(-VBusConstants.kConveyAll);
+    _eth.runInfeedSingulatorMotors(-1);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    _TestingEther.stopInfeedSingulatorConveyorMotors();
+    _eth.stopConveyorMotor();
+    _eth.stopInfeedSingulatorConveyorMotors();
   }
 
   // Returns true when the command should end.
