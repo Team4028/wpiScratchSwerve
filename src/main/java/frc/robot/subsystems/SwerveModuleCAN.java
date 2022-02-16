@@ -71,15 +71,15 @@ public class SwerveModuleCAN {
     m_turningMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
     m_turningMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
     m_turningMotor.setSelectedSensorPosition((150/7) * 2048 * getTurningEncoderRadians() / (2 * Math.PI));
-    m_turningMotor.configFeedbackNotContinuous(false, 0);
 
     //this.m_driveEncoder = new Encoder(driveEncoderPorts[0], driveEncoderPorts[1]);
 
     m_driveMotor.setNeutralMode(NeutralMode.Brake);
     m_turningMotor.setNeutralMode(NeutralMode.Brake);
     m_turningMotor.setInverted(true);
+    
 
-    configMotorPID(m_turningMotor, 0, MK4IModuleConstants.i_kPModuleTurningController, 0.0, 0.0);
+    configMotorPID(m_turningMotor, 0, .2, 0.0, 0.1);
   
 
     // Limit the PID Controller's input range between -pi and pi and set the input
@@ -117,35 +117,38 @@ public class SwerveModuleCAN {
 
     // Calculate the drive output from the drive PID controller.
     final double driveOutput =
-        state.speedMetersPerSecond / DriveConstants.i_kMaxSpeedMetersPerSecond;//ontroller.calculate(m_driveEncoder.getVelocity(), state.speedMetersPerSecond);
-
-    // Calculate the turning motor output from the turning PID controller.
-    final var turnOutput =
-        m_turningPIDController.calculate(getTurningEncoderRadians(), state.angle.getRadians());
-
+        state.speedMetersPerSecond / DriveConstants.i_kMaxSpeedMetersPerSecond;
+    // Calculate the turning motor output from the turning PID controller
     // Calculate the turning motor output from the turning PID controller.
     //m_turningMotor.setSelectedSensorPosition((150/7) * 2048 * getTurningEncoderRadians() / (2 * Math.PI));
 
-    final int wrap = 2048 * (150/7); // in encoder counts
-    final int current = (int) m_turningMotor.getSelectedSensorPosition(0);
-    final int desired = (int) Math.round(state.angle.getDegrees() * wrap / 360.0);
-    final int newPosition = (int) minChange(desired, current, wrap / 2.0) + current;
+    double desiredAngle = state.angle.getRadians();
+    double currentAngle = getTurningEncoderRadians();
+    double currentPulses = m_turningMotor.getSelectedSensorPosition();
+
+    double deltaRadians = desiredAngle - currentAngle;
+    double deltaPulses = (deltaRadians / (2 * Math.PI)) * MK4IModuleConstants.i_kEncoderCountsPerModuleRev;
+
+
 
     m_driveMotor.set(ControlMode.PercentOutput, driveOutput);
-    m_turningMotor.set(ControlMode.Position, newPosition);
+    m_turningMotor.set(ControlMode.Position, currentPulses + deltaPulses);
   }
 
   public void configMotorPID(TalonFX talon, int slotIdx, double p, double i, double d){
     talon.config_kP(slotIdx, p);
     talon.config_kI(slotIdx, i);
     talon.config_kD(slotIdx, d);
+    //talon.config_kF(slotIdx, 0.4 * 1023/8360);
+    talon.configMotionAcceleration(MK4IModuleConstants.kModuleMaxAccelerationTurningPulsesPer100MsSquared);
+    talon.configMotionCruiseVelocity(MK4IModuleConstants.kModuleMaxSpeedTurningPulsesPer100Ms);
   }
 
-  /** Zeros all the SwerveModule encoders. */
-  /*public void resetEncoders() {
-    m_driveEncoder.reset();
-    m_turningEncoder.reset();
-  }*/
+//Zeros all the SwerveModule encoders.
+  public void resetEncoders() {
+    m_driveMotor.setSelectedSensorPosition(0);
+    m_turningMotor.setSelectedSensorPosition(0);
+  }
 
 public double mod(double a, double b){
   var r = a % b;

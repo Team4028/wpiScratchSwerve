@@ -20,7 +20,7 @@ public final class Constants {
   public static final class DriveConstants {
 
     public static final boolean MK4I = true;
-    public static final boolean isNAVX = false;
+    public static final boolean isNAVX = true;
 
     public static final int kFrontLeftDriveMotorPort = 1;
     public static final int kRearLeftDriveMotorPort = 6;
@@ -112,9 +112,16 @@ public final class Constants {
         // Assumes the encoders are on a 1:1 reduction with the module shaft.
         (2 * Math.PI) / (double) i_kEncoderCPR;
 
-    public static final double i_kPModuleTurningController = 0.1;
+    public static final double i_kPModuleTurningController = 0.2;
 
     public static final double i_kPModuleDriveController = 0;
+
+    public static final double i_kEncoderCountsPerModuleRev = (150/7) * 2048;
+
+    public static final double kModuleMaxSpeedTurningRadiansPerSecond = 16*Math.PI;
+    public static final double kModuleMaxAccelerationTurningRadiansPerSecondSquared = 256*Math.PI;
+    public static final double kModuleMaxSpeedTurningPulsesPer100Ms = kModuleMaxSpeedTurningRadiansPerSecond * i_kEncoderCountsPerModuleRev * 0.1;
+    public static final double kModuleMaxAccelerationTurningPulsesPer100MsSquared = kModuleMaxAccelerationTurningRadiansPerSecondSquared * i_kEncoderCountsPerModuleRev * 0.01;
   }
 
 
