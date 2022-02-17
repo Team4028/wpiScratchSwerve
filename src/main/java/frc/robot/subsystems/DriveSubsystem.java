@@ -169,20 +169,14 @@ public class DriveSubsystem extends SubsystemBase {
    */
   @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    xSpeed *= i_kMaxSpeedMetersPerSecond;
-    ySpeed *= i_kMaxSpeedMetersPerSecond;
-    rot *= i_kMaxSpeedMetersPerSecond;
     var swerveModuleStates =
         kDriveKinematics.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, Rotation2d.fromDegrees((kGyroReversed ? -1.0 : 1.0) * m_gyro.getRotation2d().getDegrees()))
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, i_kMaxSpeedMetersPerSecond); //change for mk2
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
+        swerveModuleStates, 1.0); //change for mk2
+    setModuleStates(swerveModuleStates);
     System.out.println(swerveModuleStates[0].angle.getDegrees());
     //bruhtestmoment
   }
