@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
@@ -44,7 +45,12 @@ public class SwerveModuleCAN {
 
   private double turningMotorOffset;
 
-  private int counter = 0;
+  private int resetIterations = 0;
+
+  private final int STATUS_FRAME_GENERAL_PERIOD_MS = 250;
+  private final int CAN_TIMEOUT_MS = 250;
+
+  //private double referenceAngleRadians = 0.0;
 
   private final PIDController m_drivePIDController =
       new PIDController(0.0, 0, 0);
@@ -65,15 +71,17 @@ public class SwerveModuleCAN {
     m_driveMotor = new TalonFX(driveMotorChannel);
     m_turningMotor = new TalonFX(turningMotorChannel);
     m_turningEncoder = new CANCoder(CANEncoderPort);
-    m_turningEncoder.configFactoryDefault();
-    m_driveMotor.configFactoryDefault();
-    m_turningMotor.configFactoryDefault();
     this.turningMotorOffset = turningMotorOffset;
     m_turningEncoder.setPositionToAbsolute();
-    m_turningMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-    m_turningMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+    //m_turningMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+    //m_turningMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
     m_turningMotor.setSelectedSensorPosition((150/7) * 2048 * getTurningEncoderRadians() / (2 * Math.PI));
-    System.out.println(m_turningMotor.getSelectedSensorPosition());
+    //System.out.println(m_turningMotor.getSelectedSensorPosition());
+    m_turningMotor.setStatusFramePeriod(
+              StatusFrameEnhanced.Status_1_General,
+              STATUS_FRAME_GENERAL_PERIOD_MS,
+              CAN_TIMEOUT_MS
+      );
 
     //this.m_driveEncoder = new Encoder(driveEncoderPorts[0], driveEncoderPorts[1]);
 
@@ -130,7 +138,7 @@ public class SwerveModuleCAN {
 
 
     m_driveMotor.set(ControlMode.PercentOutput, driveOutput);
-    m_turningMotor.set(ControlMode.Position, desiredPulses);
+    m_turningMotor.set(ControlMode.Position, getTurnPulses(state.angle.getRadians()));
   }
 
   public void configMotorPID(TalonFX talon, int slotIdx, double p, double i, double d){
@@ -172,10 +180,42 @@ public double halfMod(double a, double wrap) {
 }
 
 private void checkCanCoderMotorCoder(){
- if (counter < 1){
-   counter ++;
+ if (resetIterations < 1){
+   resetIterations ++;
    System.out.println("bruh");
    m_turningMotor.setSelectedSensorPosition(getTurningEncoderRadians() / 2 / Math.PI * (150/7) * 2048);
  }
  }
+private double getTurnPulses(double referenceAngleRadians){
+  double currentAngleRadians = 2 * Math.PI * m_turningMotor.getSelectedSensorPosition() / MK4IModuleConstants.i_kEncoderCountsPerModuleRev;
+  Rotation2d refrot = new Rotation2d(referenceAngleRadians);
+  Rotation2d currot = new Rotation2d(currentAngleRadians);
+  Rotation2d changerot = refrot.minus(currot);
+//   if (2 * Math.PI * m_turningMotor.getSelectedSensorVelocity()/ 10 / MK4IModuleConstants.i_kEncoderCountsPerModuleRev < 0.5) {
+//     if (++resetIterations >= 500) {
+//         resetIterations = 0;
+//         double absoluteAngle = getTurningEncoderRadians();
+//         m_turningMotor.setSelectedSensorPosition(absoluteAngle * MK4IModuleConstants.i_kEncoderCountsPerModuleRev / 2 / Math.PI);
+//         //currentAngleRadians = absoluteAngle;
+//     }
+// } else {
+//     resetIterations = 0;s
+// }
+  return (changerot.getRadians()) / (2.0 * Math.PI) * MK4IModuleConstants.i_kEncoderCountsPerModuleRev + m_turningMotor.getSelectedSensorPosition();
+  // double currentAngleRadiansMod = currentAngleRadians % (2.0 * Math.PI);
+  // if (currentAngleRadiansMod < 0.0) {
+  //     currentAngleRadiansMod += 2.0 * Math.PI;
+  // }
+
+  // // The reference angle has the range [0, 2pi) but the Falcon's encoder can go above that
+  // double adjustedReferenceAngleRadians = referenceAngleRadians + currentAngleRadians - currentAngleRadiansMod;
+  // if (referenceAngleRadians - currentAngleRadiansMod > Math.PI) {
+  //     adjustedReferenceAngleRadians -= 2.0 * Math.PI;
+  // } else if (referenceAngleRadians - currentAngleRadiansMod < -Math.PI) {
+  //     adjustedReferenceAngleRadians += 2.0 * Math.PI;
+  // }
+  // //this.referenceAngleRadians = referenceAngleRadians;
+  //return adjustedReferenceAngleRadians * MK4IModuleConstants.i_kEncoderCountsPerModuleRev / 2 / Math.PI;
+}
+
 }

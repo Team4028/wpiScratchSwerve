@@ -177,7 +177,7 @@ public class DriveSubsystem extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, 1.0); //change for mk2
     setModuleStates(swerveModuleStates);
-    System.out.println(swerveModuleStates[0].angle.getDegrees());
+    //System.out.println(swerveModuleStates[0].angle.getDegrees());
     //bruhtestmoment
   }
 
