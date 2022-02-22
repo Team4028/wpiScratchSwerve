@@ -7,24 +7,40 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix.sensors.WPI_CANCoder;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+import com.ctre.phoenix.sensors.SensorTimeBase;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxRelativeEncoder.Type;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.AnalogEncoder;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.Constants;
+import frc.robot.util;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MK4IModuleConstants;
+import frc.robot.Constants.ModuleConstants;
 
 public class SwerveModuleCAN {
-  private final WPI_TalonFX m_driveMotor;
-  private final WPI_TalonFX m_turningMotor;
+  private final TalonFX m_driveMotor;
+  private final TalonFX m_turningMotor;
 
   //private final RelativeEncoder m_driveEncoder;
-  private final WPI_CANCoder m_turningEncoder;
+  private final CANCoder m_turningEncoder;
   //private final AnalogInput m_offsetEncoder;
 
   private double turningMotorOffset;
@@ -33,6 +49,12 @@ public class SwerveModuleCAN {
 
   private final int STATUS_FRAME_GENERAL_PERIOD_MS = 250;
   private final int CAN_TIMEOUT_MS = 250;
+
+  //private double referenceAngleRadians = 0.0;
+
+  private final PIDController m_drivePIDController =
+      new PIDController(0.0, 0, 0);
+
   private final PIDController m_turningPIDController = new PIDController(0.5, 0, 0.0);
 
   /**
@@ -46,38 +68,15 @@ public class SwerveModuleCAN {
       int turningMotorChannel,
       int CANEncoderPort,
       double turningMotorOffset) {
-    m_driveMotor = new WPI_TalonFX(driveMotorChannel);
-    m_turningMotor = new WPI_TalonFX(turningMotorChannel);
-    m_turningEncoder = new WPI_CANCoder(CANEncoderPort);
-    m_driveMotor.configFactoryDefault();
-        
-    m_driveMotor.setInverted(false);
-    m_driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, Constants.kDefaultTimeout);
-    // m_driveMotor.config_kF(Constants.kDefaultPIDSlotID, 0, Constants.kDefaultTimeout);
-    // m_driveMotor.config_kP(Constants.kDefaultPIDSlotID, 0, Constants.kDefaultTimeout);
-    // m_driveMotor.config_kI(Constants.kDefaultPIDSlotID, 0, Constants.kDefaultTimeout);
-    // m_driveMotor.config_kD(Constants.kDefaultPIDSlotID, 0, Constants.kDefaultTimeout);  
-    // m_driveMotor.config_IntegralZone(0, 0);
-
-    //Setup the Steering Sensor
-    m_turningEncoder.configSensorDirection(false);
-    m_turningEncoder.configMagnetOffset(Math.toDegrees(turningMotorOffset));
+    m_driveMotor = new TalonFX(driveMotorChannel);
+    m_turningMotor = new TalonFX(turningMotorChannel);
+    m_turningEncoder = new CANCoder(CANEncoderPort);
+    this.turningMotorOffset = turningMotorOffset;
     m_turningEncoder.setPositionToAbsolute();
-    //Setup the the closed-loop PID for the steering module loop
-    
-    m_turningMotor.configFactoryDefault();
-    m_turningMotor.configFeedbackNotContinuous(false, Constants.kDefaultTimeout);
-    m_turningMotor.configSelectedFeedbackCoefficient(1/Constants.TICKSperTALONFX_DEGREE,0,Constants.kDefaultTimeout);
-    m_turningMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor,0,Constants.kDefaultTimeout);
-
-    m_turningMotor.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0,1,Constants.kDefaultTimeout);
-    m_turningMotor.configRemoteFeedbackFilter(m_turningEncoder, 0);
-    m_turningMotor.configSelectedFeedbackCoefficient(Constants.STEERING_SENSOR_DEGREESperTICKS, 1, Constants.kDefaultTimeout);
-    m_turningMotor.configAllowableClosedloopError(Constants.kDefaultPIDSlotID, Constants.kDefaultClosedLoopError, Constants.kDefaultTimeout);
-    // m_turningMotor.config_kF(Constants.kDefaultPIDSlotID, 0, Constants.kDefaultTimeout);
-    // m_turningMotor.config_kP(Constants.kDefaultPIDSlotID, 0, Constants.kDefaultTimeout);
-    // m_turningMotor.config_kI(Constants.kDefaultPIDSlotID, 0, Constants.kDefaultTimeout);
-    // m_turningMotor.config_kD(Constants.kDefaultPIDSlotID, 0, Constants.kDefaultTimeout);  
+    //m_turningMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+    //m_turningMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+    m_turningMotor.setSelectedSensorPosition((150/7) * 2048 * getTurningEncoderRadians() / (2 * Math.PI));
+    //System.out.println(m_turningMotor.getSelectedSensorPosition());
     m_turningMotor.setStatusFramePeriod(
               StatusFrameEnhanced.Status_1_General,
               STATUS_FRAME_GENERAL_PERIOD_MS,
@@ -139,11 +138,10 @@ public class SwerveModuleCAN {
 
 
     m_driveMotor.set(ControlMode.PercentOutput, driveOutput);
-    //m_turningMotor.set(ControlMode.Position, getTurnPulses(state.angle.getRadians()));
-    setSteeringAngle(state.angle.getDegrees());
+    m_turningMotor.set(ControlMode.Position, getTurnPulses(state.angle.getRadians()));
   }
 
-  public void configMotorPID(WPI_TalonFX talon, int slotIdx, double p, double i, double d){
+  public void configMotorPID(TalonFX talon, int slotIdx, double p, double i, double d){
     talon.config_kP(slotIdx, p);
     talon.config_kI(slotIdx, i);
     talon.config_kD(slotIdx, d);
@@ -193,38 +191,31 @@ private double getTurnPulses(double referenceAngleRadians){
   Rotation2d refrot = new Rotation2d(referenceAngleRadians);
   Rotation2d currot = new Rotation2d(currentAngleRadians);
   Rotation2d changerot = refrot.minus(currot);
+//   if (2 * Math.PI * m_turningMotor.getSelectedSensorVelocity()/ 10 / MK4IModuleConstants.i_kEncoderCountsPerModuleRev < 0.5) {
+//     if (++resetIterations >= 500) {
+//         resetIterations = 0;
+//         double absoluteAngle = getTurningEncoderRadians();
+//         m_turningMotor.setSelectedSensorPosition(absoluteAngle * MK4IModuleConstants.i_kEncoderCountsPerModuleRev / 2 / Math.PI);
+//         //currentAngleRadians = absoluteAngle;
+//     }
+// } else {
+//     resetIterations = 0;s
+// }
   return (changerot.getRadians()) / (2.0 * Math.PI) * MK4IModuleConstants.i_kEncoderCountsPerModuleRev + m_turningMotor.getSelectedSensorPosition();
-}
-public void setSteeringAngle(double _angle){
-  //double newAngleDemand = _angle;
-  double currentSensorPosition = m_turningMotor.getSelectedSensorPosition();
-  double remainder = Math.IEEEremainder(currentSensorPosition, 360);
-  double newAngleDemand = _angle + currentSensorPosition -remainder;
- 
-  //System.out.println(m_turningMotor.getSelectedSensorPosition()-remainder );
-  if(newAngleDemand - currentSensorPosition > 180.1){
-        newAngleDemand -= 360;
-    } else if (newAngleDemand - currentSensorPosition < -180.1){
-        newAngleDemand += 360;
-    }
-    
-  m_turningMotor.set(ControlMode.Position, newAngleDemand );
-}
+  // double currentAngleRadiansMod = currentAngleRadians % (2.0 * Math.PI);
+  // if (currentAngleRadiansMod < 0.0) {
+  //     currentAngleRadiansMod += 2.0 * Math.PI;
+  // }
 
-public double getSteeringAngle(){
-  return m_turningEncoder.getAbsolutePosition();
-}
-
-public static SwerveModuleState optimize(
-  SwerveModuleState desiredState, Rotation2d currentAngle) {
-var delta = desiredState.angle.minus(currentAngle);
-if (Math.abs(delta.getDegrees()) > 90.0) {
-  return new SwerveModuleState(
-      -desiredState.speedMetersPerSecond,
-      desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
-} else {
-  return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
-}
+  // // The reference angle has the range [0, 2pi) but the Falcon's encoder can go above that
+  // double adjustedReferenceAngleRadians = referenceAngleRadians + currentAngleRadians - currentAngleRadiansMod;
+  // if (referenceAngleRadians - currentAngleRadiansMod > Math.PI) {
+  //     adjustedReferenceAngleRadians -= 2.0 * Math.PI;
+  // } else if (referenceAngleRadians - currentAngleRadiansMod < -Math.PI) {
+  //     adjustedReferenceAngleRadians += 2.0 * Math.PI;
+  // }
+  // //this.referenceAngleRadians = referenceAngleRadians;
+  //return adjustedReferenceAngleRadians * MK4IModuleConstants.i_kEncoderCountsPerModuleRev / 2 / Math.PI;
 }
 
 }
