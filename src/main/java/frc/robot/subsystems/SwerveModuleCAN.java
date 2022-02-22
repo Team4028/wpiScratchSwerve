@@ -16,6 +16,7 @@ import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
+import com.ctre.phoenix.sensors.WPI_CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -41,7 +42,7 @@ public class SwerveModuleCAN {
   private final TalonFX m_turningMotor;
 
   //private final RelativeEncoder m_driveEncoder;
-  private final CANCoder m_turningEncoder;
+  private final WPI_CANCoder m_turningEncoder;
   //private final AnalogInput m_offsetEncoder;
 
   private double turningMotorOffset;
@@ -71,20 +72,22 @@ public class SwerveModuleCAN {
       double turningMotorOffset) {
     m_driveMotor = new TalonFX(driveMotorChannel);
     m_turningMotor = new TalonFX(turningMotorChannel);
-    m_turningEncoder = new CANCoder(CANEncoderPort);
+    m_turningEncoder = new WPI_CANCoder(CANEncoderPort);
     this.turningMotorOffset = turningMotorOffset;
-    m_turningEncoder.setPositionToAbsolute();
+    //m_turningEncoder.setPositionToAbsolute();
     m_turningEncoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, 0);
     m_turningEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
     //m_turningEncoder.configSensorDirection(true);
     m_turningEncoder.configMagnetOffset(Math.toDegrees(turningMotorOffset));
-    m_turningMotor.configRemoteFeedbackFilter(m_turningEncoder.getDeviceID(), RemoteSensorSource.CANCoder, 0);
+    m_turningMotor.configRemoteFeedbackFilter(m_turningEncoder, 0);
     //m_turningEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
     m_turningMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.RemoteSensor0, 0, 0);
     m_turningMotor.configSelectedFeedbackCoefficient(1);
     //m_turningMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
+    m_turningMotor.getSensorCollection().setIntegratedSensorPositionToAbsolute(0);
     // m_turningMotor.setSelectedSensorPosition((150/7) * 2048 * getTurningEncoderRadians() / (2 * Math.PI));
     //System.out.println(m_turningMotor.getSelectedSensorPosition());
+    m_turningEncoder.setPositionToAbsolute();
     m_turningMotor.setStatusFramePeriod(
               StatusFrameEnhanced.Status_1_General,
               STATUS_FRAME_GENERAL_PERIOD_MS,
@@ -113,7 +116,7 @@ public class SwerveModuleCAN {
     //     angle += 2.0 * Math.PI;
     // }
     // return angle;
-    return Math.toRadians(m_turningMotor.getSelectedSensorPosition() / 4096 * 360);
+    return Math.toRadians(m_turningMotor.getSelectedSensorPosition(0) / 4096 * 360);
     }
 
   /**
@@ -134,7 +137,7 @@ public class SwerveModuleCAN {
     checkCanCoderMotorCoder();
     // Optimize the reference state to avoid spinning further than 90 degrees
     SwerveModuleState state =
-        SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(m_turningMotor.getSelectedSensorPosition() * (7/150) / 2048 * 360));
+        SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(m_turningMotor.getSelectedSensorPosition(0) * (7/150) / 2048 * 360));
 
     // Calculate the drive output from the drive PID controller.
     final double driveOutput =
@@ -188,20 +191,25 @@ public double halfMod(double a, double wrap) {
 }
 
 private void checkCanCoderMotorCoder(){
- if (resetIterations < 1){
+ if (resetIterations <1){
    resetIterations ++;
    System.out.println("bruh");
-   //m_turningMotor.setSelectedSensorPosition(getTurningEncoderRadians() / 2 / Math.PI * (150/7) * 2048);
+   m_turningEncoder.setPositionToAbsolute();
+  
  }
+ resetIterations++;
  }
 
 private SwerveModuleState bruhoptimize(SwerveModuleState st, double currentAngleRadians){
   double changeAngleRads = st.angle.getRadians() - currentAngleRadians;
+  while(Math.abs(changeAngleRads) > Math.PI / 2){
   if(changeAngleRads > Math.PI / 2){
-    st = new SwerveModuleState(-st.speedMetersPerSecond, st.angle.rotateBy(Rotation2d.fromDegrees(180)));
+    st = new SwerveModuleState(-st.speedMetersPerSecond, new Rotation2d(st.angle.getRadians() - Math.PI));
   } else if(changeAngleRads < -Math.PI / 2){
-    st = new SwerveModuleState(-st.speedMetersPerSecond, st.angle.rotateBy(Rotation2d.fromDegrees(180)));
+    st = new SwerveModuleState(-st.speedMetersPerSecond, new Rotation2d(st.angle.getRadians() + Math.PI));
   }
+  changeAngleRads = st.angle.getRadians() - currentAngleRadians;
+}
   return st;
 }
 private double getTurnPulses(double referenceAngleRadians){
