@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -73,9 +74,16 @@ public class SwerveModuleCAN {
     m_turningEncoder = new CANCoder(CANEncoderPort);
     this.turningMotorOffset = turningMotorOffset;
     m_turningEncoder.setPositionToAbsolute();
-    //m_turningMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-    //m_turningMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-    m_turningMotor.setSelectedSensorPosition((150/7) * 2048 * getTurningEncoderRadians() / (2 * Math.PI));
+    m_turningEncoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, 0);
+    m_turningEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+    //m_turningEncoder.configSensorDirection(true);
+    m_turningEncoder.configMagnetOffset(Math.toDegrees(turningMotorOffset));
+    m_turningMotor.configRemoteFeedbackFilter(m_turningEncoder.getDeviceID(), RemoteSensorSource.CANCoder, 0);
+    //m_turningEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
+    m_turningMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.RemoteSensor0, 0, 0);
+    m_turningMotor.configSelectedFeedbackCoefficient(1);
+    //m_turningMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
+    // m_turningMotor.setSelectedSensorPosition((150/7) * 2048 * getTurningEncoderRadians() / (2 * Math.PI));
     //System.out.println(m_turningMotor.getSelectedSensorPosition());
     m_turningMotor.setStatusFramePeriod(
               StatusFrameEnhanced.Status_1_General,
@@ -90,7 +98,7 @@ public class SwerveModuleCAN {
     m_turningMotor.setInverted(true);
     
 
-    configMotorPID(m_turningMotor, 0, .2, 0.0, 0.1);
+    configMotorPID(m_turningMotor, 0, 1.2, 0.0, 0);
   
 
     // Limit the PID Controller's input range between -pi and pi and set the input
@@ -99,12 +107,13 @@ public class SwerveModuleCAN {
   }
 
   private double getTurningEncoderRadians(){
-    double angle = Math.toRadians(m_turningEncoder.getAbsolutePosition()) + turningMotorOffset;
-    angle %= 2.0 * Math.PI;
-    if (angle < 0.0) {
-        angle += 2.0 * Math.PI;
-    }
-    return angle;
+    // double angle = Math.toRadians(m_turningEncoder.getAbsolutePosition()) + turningMotorOffset;
+    // angle %= 2.0 * Math.PI;
+    // if (angle < 0.0) {
+    //     angle += 2.0 * Math.PI;
+    // }
+    // return angle;
+    return Math.toRadians(m_turningMotor.getSelectedSensorPosition() / 4096 * 360);
     }
 
   /**
@@ -125,20 +134,19 @@ public class SwerveModuleCAN {
     checkCanCoderMotorCoder();
     // Optimize the reference state to avoid spinning further than 90 degrees
     SwerveModuleState state =
-        SwerveModuleState.optimize(desiredState, new Rotation2d(getTurningEncoderRadians()));
+        SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(m_turningMotor.getSelectedSensorPosition() * (7/150) / 2048 * 360));
 
     // Calculate the drive output from the drive PID controller.
     final double driveOutput =
-        state.speedMetersPerSecond;
+        bruhoptimize(state, getTurningEncoderRadians()).speedMetersPerSecond;
     // Calculate the turning motor output from the turning PID controller
     // Calculate the turning motor output from the turning PID controller.
     //m_turningMotor.setSelectedSensorPosition((150/7) * 2048 * getTurningEncoderRadians() / (2 * Math.PI));
-    double desiredPulses = state.angle.getDegrees() / 360 * (150/7) * 2048;
-    double deltaPulses = desiredPulses - m_turningMotor.getSelectedSensorPosition();
-
+    // double desiredPulses = state.angle.getDegrees() / 360 * (150/7) * 2048;
+    // double deltaPulses = desiredPulses - m_turningMotor.getSelectedSensorPosition();
 
     m_driveMotor.set(ControlMode.PercentOutput, driveOutput);
-    m_turningMotor.set(ControlMode.Position, getTurnPulses(state.angle.getRadians()));
+    m_turningMotor.set(ControlMode.Position, bruhoptimize(state, getTurningEncoderRadians()).angle.getDegrees() * 4096 / 360);
   }
 
   public void configMotorPID(TalonFX talon, int slotIdx, double p, double i, double d){
@@ -146,8 +154,8 @@ public class SwerveModuleCAN {
     talon.config_kI(slotIdx, i);
     talon.config_kD(slotIdx, d);
     //talon.config_kF(slotIdx, 0.4 * 1023/8360);
-    talon.configMotionAcceleration(MK4IModuleConstants.kModuleMaxAccelerationTurningPulsesPer100MsSquared);
-    talon.configMotionCruiseVelocity(MK4IModuleConstants.kModuleMaxSpeedTurningPulsesPer100Ms);
+    // talon.configMotionAcceleration(MK4IModuleConstants.kModuleMaxAccelerationTurningPulsesPer100MsSquared);
+    // talon.configMotionCruiseVelocity(MK4IModuleConstants.kModuleMaxSpeedTurningPulsesPer100Ms);
   }
 
 //Zeros all the SwerveModule encoders.
@@ -183,14 +191,26 @@ private void checkCanCoderMotorCoder(){
  if (resetIterations < 1){
    resetIterations ++;
    System.out.println("bruh");
-   m_turningMotor.setSelectedSensorPosition(getTurningEncoderRadians() / 2 / Math.PI * (150/7) * 2048);
+   //m_turningMotor.setSelectedSensorPosition(getTurningEncoderRadians() / 2 / Math.PI * (150/7) * 2048);
  }
  }
+
+private SwerveModuleState bruhoptimize(SwerveModuleState st, double currentAngleRadians){
+  double changeAngleRads = st.angle.getRadians() - currentAngleRadians;
+  if(changeAngleRads > Math.PI / 2){
+    st = new SwerveModuleState(-st.speedMetersPerSecond, st.angle.rotateBy(Rotation2d.fromDegrees(180)));
+  } else if(changeAngleRads < -Math.PI / 2){
+    st = new SwerveModuleState(-st.speedMetersPerSecond, st.angle.rotateBy(Rotation2d.fromDegrees(180)));
+  }
+  return st;
+}
 private double getTurnPulses(double referenceAngleRadians){
-  double currentAngleRadians = 2 * Math.PI * m_turningMotor.getSelectedSensorPosition() / MK4IModuleConstants.i_kEncoderCountsPerModuleRev;
+  double currentAngleRadians = getTurningEncoderRadians();
+  double currentRefAngle = Math.atan2(Math.sin(currentAngleRadians), Math.cos(currentAngleRadians));
   Rotation2d refrot = new Rotation2d(referenceAngleRadians);
   Rotation2d currot = new Rotation2d(currentAngleRadians);
   Rotation2d changerot = refrot.minus(currot);
+  return referenceAngleRadians * MK4IModuleConstants.i_kEncoderCPR / 2 / Math.PI;
 //   if (2 * Math.PI * m_turningMotor.getSelectedSensorVelocity()/ 10 / MK4IModuleConstants.i_kEncoderCountsPerModuleRev < 0.5) {
 //     if (++resetIterations >= 500) {
 //         resetIterations = 0;
@@ -201,7 +221,7 @@ private double getTurnPulses(double referenceAngleRadians){
 // } else {
 //     resetIterations = 0;s
 // }
-  return (changerot.getRadians()) / (2.0 * Math.PI) * MK4IModuleConstants.i_kEncoderCountsPerModuleRev + m_turningMotor.getSelectedSensorPosition();
+  // return (changerot.getRadians()) / (2.0 * Math.PI) * MK4IModuleConstants.i_kEncoderCountsPerModuleRev + m_turningMotor.getSelectedSensorPosition();
   // double currentAngleRadiansMod = currentAngleRadians % (2.0 * Math.PI);
   // if (currentAngleRadiansMod < 0.0) {
   //     currentAngleRadiansMod += 2.0 * Math.PI;
