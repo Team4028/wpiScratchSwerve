@@ -87,6 +87,7 @@ public class SwerveModuleCAN {
     m_turningMotor.getSensorCollection().setIntegratedSensorPositionToAbsolute(0);
     // m_turningMotor.setSelectedSensorPosition((150/7) * 2048 * getTurningEncoderRadians() / (2 * Math.PI));
     //System.out.println(m_turningMotor.getSelectedSensorPosition());
+    //bruhtest
     m_turningEncoder.setPositionToAbsolute();
     m_turningMotor.setStatusFramePeriod(
               StatusFrameEnhanced.Status_1_General,
