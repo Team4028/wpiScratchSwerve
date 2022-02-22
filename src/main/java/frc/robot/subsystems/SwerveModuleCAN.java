@@ -5,41 +5,21 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
-import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
-import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxRelativeEncoder.Type;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.AnalogEncoder;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.RobotController;
-import frc.robot.Constants;
-import frc.robot.util;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MK4IModuleConstants;
-import frc.robot.Constants.ModuleConstants;
 
 public class SwerveModuleCAN {
-  private final TalonFX m_driveMotor;
-  private final TalonFX m_turningMotor;
+  private final WPI_TalonFX m_driveMotor;
+  private final WPI_TalonFX m_turningMotor;
   private final WPI_CANCoder m_turningEncoder;
 
   private int resetIterations = 0;
@@ -58,8 +38,8 @@ public class SwerveModuleCAN {
       int turningMotorChannel,
       int CANEncoderPort,
       double turningMotorOffset) {
-    m_driveMotor = new TalonFX(driveMotorChannel);
-    m_turningMotor = new TalonFX(turningMotorChannel);
+    m_driveMotor = new WPI_TalonFX(driveMotorChannel);
+    m_turningMotor = new WPI_TalonFX(turningMotorChannel);
     m_turningEncoder = new WPI_CANCoder(CANEncoderPort);
     m_turningEncoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, 0);
     m_turningEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
@@ -77,9 +57,10 @@ public class SwerveModuleCAN {
     m_driveMotor.setNeutralMode(NeutralMode.Brake);
     m_turningMotor.setNeutralMode(NeutralMode.Brake);
     m_turningMotor.setInverted(true);
+    m_turningMotor.selectProfileSlot(0, 0);
     
 
-    configMotorPID(m_turningMotor, 0, 1.2, 0.0, 0);
+    configMotorPID(m_turningMotor, 0, 1.2, 0.0, 0.0);
   }
 
   private double getTurningEncoderRadians(){
@@ -114,7 +95,7 @@ public class SwerveModuleCAN {
     m_turningMotor.set(ControlMode.Position, getTurnPulses(optimize(state, getTurningEncoderRadians()).angle.getRadians()));
   }
 
-  public void configMotorPID(TalonFX talon, int slotIdx, double p, double i, double d){
+  public void configMotorPID(WPI_TalonFX talon, int slotIdx, double p, double i, double d){
     talon.config_kP(slotIdx, p);
     talon.config_kI(slotIdx, i);
     talon.config_kD(slotIdx, d);

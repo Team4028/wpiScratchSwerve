@@ -38,10 +38,10 @@ public class DriveSubsystem extends SubsystemBase {
   // private  SwerveModule m_rearRight;
 
 
-  private static final double i_FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(205.1);//204.6);//0.0);//60.6);//60.7
-  private static final double i_FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(203.9);//204.2);//141.2);//139.1
-  private static final double i_BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(328.1);//329.4);//60.6);//60.7
-  private static final double i_BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(160.5);//160.6);//60.3);//60.7
+  private static final double i_FRONT_LEFT_ANGLE_OFFSET = Math.toRadians(154.6);//205.1);//204.6);//0.0);//60.6);//60.7
+  private static final double i_FRONT_RIGHT_ANGLE_OFFSET = Math.toRadians(169.3);//203.9-18);//204.2);//141.2);//139.1
+  private static final double i_BACK_LEFT_ANGLE_OFFSET = Math.toRadians(31.3);//328.1);//329.4);//60.6);//60.7
+  private static final double i_BACK_RIGHT_ANGLE_OFFSET = Math.toRadians(199.1);//160.5);//160.6);//60.3);//60.7
 
   private static DriveSubsystem _instance;
   public static final DriveSubsystem get_instance(){
