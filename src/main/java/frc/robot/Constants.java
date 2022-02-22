@@ -62,7 +62,7 @@ public final class Constants {
             new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
             new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-    public static final boolean kGyroReversed = false; //true for mk2 chassis
+    public static final boolean kGyroReversed = true; //true for mk2 chassis
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
