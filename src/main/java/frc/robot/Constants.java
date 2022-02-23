@@ -51,9 +51,9 @@ public final class Constants {
     public static final int pigeonCan = 1;
 
 
-    public static final double kTrackWidth = util.inchesToMeters(23.75);
+    public static final double kTrackWidth = util.inchesToMeters(23.75 - 2);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = util.inchesToMeters(25.75);
+    public static final double kWheelBase = util.inchesToMeters(25.75 - 2);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics =
         new SwerveDriveKinematics(
