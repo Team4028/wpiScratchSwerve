@@ -4,13 +4,17 @@
 
 package frc.robot.subsystems;
 
+import java.util.concurrent.CancellationException;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -41,13 +45,20 @@ public class SwerveModuleCAN {
     m_driveMotor = new WPI_TalonFX(driveMotorChannel);
     m_turningMotor = new WPI_TalonFX(turningMotorChannel);
     m_turningEncoder = new WPI_CANCoder(CANEncoderPort);
-    m_turningEncoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, 0);
+    m_driveMotor.configFactoryDefault();
+    m_turningEncoder.configFactoryDefault();
+    m_turningEncoder.configFactoryDefault();
+    m_turningEncoder.setPositionToAbsolute();
+    m_turningEncoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, CAN_TIMEOUT_MS);
     m_turningEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
     m_turningEncoder.configMagnetOffset(Math.toDegrees(turningMotorOffset));
-    m_turningMotor.configRemoteFeedbackFilter(m_turningEncoder, 0);
-    m_turningMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.RemoteSensor0, 0, 0);
+    m_turningMotor.configRemoteFeedbackFilter(m_turningEncoder, 0, CAN_TIMEOUT_MS);
+    m_turningMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.RemoteSensor0, 0, CAN_TIMEOUT_MS);
     m_turningMotor.configSelectedFeedbackCoefficient(1);
-    m_turningEncoder.setPositionToAbsolute();
+    m_turningEncoder.configFeedbackCoefficient(1, "nu", SensorTimeBase.PerSecond);
+    m_turningEncoder.configSensorDirection(true, CAN_TIMEOUT_MS);
+    m_turningMotor.setSensorPhase(false);
+    m_turningMotor.configAllowableClosedloopError(0, 10, CAN_TIMEOUT_MS);
     m_turningMotor.setStatusFramePeriod(
               StatusFrameEnhanced.Status_1_General,
               STATUS_FRAME_GENERAL_PERIOD_MS,
@@ -60,7 +71,7 @@ public class SwerveModuleCAN {
     m_turningMotor.selectProfileSlot(0, 0);
     
 
-    configMotorPID(m_turningMotor, 0, 1.2, 0.0, 0.0);
+    configMotorPID(m_turningMotor, 0, 1.2/2.1, 0.0, 0);
   }
 
   private double getTurningEncoderRadians(){
@@ -96,9 +107,9 @@ public class SwerveModuleCAN {
   }
 
   public void configMotorPID(WPI_TalonFX talon, int slotIdx, double p, double i, double d){
-    talon.config_kP(slotIdx, p);
-    talon.config_kI(slotIdx, i);
-    talon.config_kD(slotIdx, d);
+    talon.config_kP(slotIdx, p, CAN_TIMEOUT_MS);
+    talon.config_kI(slotIdx, i, CAN_TIMEOUT_MS);
+    talon.config_kD(slotIdx, d, CAN_TIMEOUT_MS);
   }
 
 //Zeros all the SwerveModule encoders.

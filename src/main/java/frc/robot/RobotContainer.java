@@ -51,10 +51,11 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 m_robotDrive.drive(
-                    util.deadband(-m_driverController.getLeftY()/4),
-                    util.deadband(-m_driverController.getLeftX()/4),
-                    util.deadband(-m_driverController.getRightX()/4),
-                    true),
+                    util.deadband(-m_driverController.getLeftY()),
+                    util.deadband(-m_driverController.getLeftX()),
+                    util.deadband(-m_driverController.getRightX()),
+                    true,
+                    m_driverController.getRightTriggerAxis()),
             m_robotDrive));
   }
 
@@ -115,6 +116,6 @@ public class RobotContainer {
     m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
 
     // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
+    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, 1));
   }
 }

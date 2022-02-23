@@ -168,7 +168,11 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   @SuppressWarnings("ParameterName")
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, double additionalSpeedScale) {
+    additionalSpeedScale *= 0.75;
+    xSpeed *= 0.25 + additionalSpeedScale;
+    ySpeed *= 0.25 + additionalSpeedScale;
+    rot *= 0.25 + additionalSpeedScale;
     var swerveModuleStates =
         kDriveKinematics.toSwerveModuleStates(
             fieldRelative
