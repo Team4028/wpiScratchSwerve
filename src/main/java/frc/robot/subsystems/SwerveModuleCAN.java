@@ -71,7 +71,7 @@ public class SwerveModuleCAN {
     m_turningMotor.selectProfileSlot(0, 0);
     
 
-    configMotorPID(m_turningMotor, 0, 1.2/2.1, 0.0, 0);
+    configMotorPID(m_turningMotor, 0, 1.2/2.1, 0.0, 0.06);
   }
 
   private double getTurningEncoderRadians(){
