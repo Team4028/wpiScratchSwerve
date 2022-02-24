@@ -4,13 +4,10 @@
 
 package frc.robot.subsystems;
 
-import java.util.concurrent.CancellationException;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
@@ -71,7 +68,7 @@ public class SwerveModuleCAN {
     m_turningMotor.selectProfileSlot(0, 0);
     
 
-    configMotorPID(m_turningMotor, 0, 1.2/2.1, 0.0, 0.06);
+    configMotorPID(m_turningMotor, 0, 0.57, 0.0, 0.06);
   }
 
   private double getTurningEncoderRadians(){

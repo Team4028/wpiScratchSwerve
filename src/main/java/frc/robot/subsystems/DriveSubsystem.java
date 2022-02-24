@@ -4,9 +4,8 @@
 
 package frc.robot.subsystems;
 
-import java.util.NavigableMap;
+import static frc.robot.Constants.DriveConstants.*;
 
-import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
 
@@ -17,20 +16,18 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
-import frc.robot.util;
-import frc.robot.Constants.DriveConstants;
-
-import static frc.robot.Constants.DriveConstants.*;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.util;
 
 public class DriveSubsystem extends SubsystemBase {
 
-  private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(146.7);//0.0);//60.6);//60.7
-  private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(147.0);//141.2);//139.1
-  private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(314.6);//60.6);//60.7
-  private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(70.9);//60.3);//60.7
+  // private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(146.7);//0.0);//60.6);//60.7
+  // private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(147.0);//141.2);//139.1
+  // private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(314.6);//60.6);//60.7
+  // private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(70.9);//60.3);//60.7
 
   // private  SwerveModule m_frontLeft;
   // private  SwerveModule m_frontRight;
@@ -169,20 +166,18 @@ public class DriveSubsystem extends SubsystemBase {
    */
   @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, double additionalSpeedScale) {
-    additionalSpeedScale *= 0.75;
-    xSpeed *= 0.25 + additionalSpeedScale;
-    ySpeed *= 0.25 + additionalSpeedScale;
-    rot *= 0.25 + additionalSpeedScale;
+    double speedScale = DriveConstants.BASE_SPEED_SCALE + additionalSpeedScale * (1 - DriveConstants.BASE_SPEED_SCALE);
+    xSpeed *= speedScale;
+    ySpeed *= speedScale;
+    rot *= speedScale;
     var swerveModuleStates =
         kDriveKinematics.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, Rotation2d.fromDegrees((kGyroReversed ? -1.0 : 1.0) * m_gyro.getRotation2d().getDegrees()))
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, 1.0); //change for mk2
+        swerveModuleStates, 1.0);
     setModuleStates(swerveModuleStates);
-    //System.out.println(swerveModuleStates[0].angle.getDegrees());
-    //bruhtestmoment
   }
 
   /**
@@ -200,12 +195,12 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
-  // public void resetEncoders() {
-  //   m_frontLeft.resetEncoders();
-  //   m_rearLeft.resetEncoders();
-  //   m_frontRight.resetEncoders();
-  //   m_rearRight.resetEncoders();
-  // }
+  public void resetEncoders() {
+    m_frontLeft.resetEncoders();
+    m_rearLeft.resetEncoders();
+    m_frontRight.resetEncoders();
+    m_rearRight.resetEncoders();
+  }
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
