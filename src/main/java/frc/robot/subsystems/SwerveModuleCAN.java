@@ -16,6 +16,7 @@ import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MK4IModuleConstants;
 
 public class SwerveModuleCAN {
@@ -23,10 +24,10 @@ public class SwerveModuleCAN {
   private final WPI_TalonFX m_turningMotor;
   private final WPI_CANCoder m_turningEncoder;
 
-  private int resetIterations = 0;
-
   private final int STATUS_FRAME_GENERAL_PERIOD_MS = 250;
   private final int CAN_TIMEOUT_MS = 250;
+
+  private int resetIterations = 0;
 
   /**
    * Constructs a SwerveModule.
@@ -63,6 +64,7 @@ public class SwerveModuleCAN {
       );
 
     m_driveMotor.setNeutralMode(NeutralMode.Brake);
+    m_driveMotor.configSelectedFeedbackCoefficient(1);
     m_turningMotor.setNeutralMode(NeutralMode.Brake);
     m_turningMotor.setInverted(true);
     m_turningMotor.selectProfileSlot(0, 0);
@@ -81,7 +83,7 @@ public class SwerveModuleCAN {
    * @return The current state of the module.
    */
   public SwerveModuleState getState() {
-    return new SwerveModuleState(m_driveMotor.getSelectedSensorVelocity(), new Rotation2d(getTurningEncoderRadians()));
+    return new SwerveModuleState(m_driveMotor.getSelectedSensorVelocity() * MK4IModuleConstants.i_kDriveEncoderDistancePerPulse, new Rotation2d(getTurningEncoderRadians()));
   }
 
   /**
@@ -90,17 +92,17 @@ public class SwerveModuleCAN {
    * @param desiredState Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState desiredState) {
-    checkCanCoderMotorCoder();
+    checkMotorCoder();
     // Optimize the reference state to avoid spinning further than 90 degrees
     SwerveModuleState state =
-        SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(m_turningMotor.getSelectedSensorPosition(0) * (7/150) / 2048 * 360));
+        optimize(SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(m_turningMotor.getSelectedSensorPosition(0) * (7/150) / 2048 * 360)), getTurningEncoderRadians());
 
     // Calculate the drive output from the drive PID controller.
     final double driveOutput =
-        optimize(state, getTurningEncoderRadians()).speedMetersPerSecond;
+        DriveConstants.driveTrainFeedforward.calculate(state.speedMetersPerSecond);
 
-    m_driveMotor.set(ControlMode.PercentOutput, driveOutput);
-    m_turningMotor.set(ControlMode.Position, getTurnPulses(optimize(state, getTurningEncoderRadians()).angle.getRadians()));
+    m_driveMotor.setVoltage(driveOutput);
+    m_turningMotor.set(ControlMode.Position, getTurnPulses(state.angle.getRadians()));
   }
 
   public void configMotorPID(WPI_TalonFX talon, int slotIdx, double p, double i, double d){
@@ -114,16 +116,6 @@ public class SwerveModuleCAN {
     m_driveMotor.setSelectedSensorPosition(0);
     m_turningMotor.setSelectedSensorPosition(0);
   }
-
-private void checkCanCoderMotorCoder(){
- if (resetIterations <1){
-   resetIterations ++;
-   System.out.println("bruh");
-   m_turningEncoder.setPositionToAbsolute();
-  
- }
- resetIterations++;
- }
 
 private SwerveModuleState optimize(SwerveModuleState st, double currentAngleRadians){
   double changeAngleRads = st.angle.getRadians() - currentAngleRadians;
@@ -139,6 +131,13 @@ private SwerveModuleState optimize(SwerveModuleState st, double currentAngleRadi
 }
 private double getTurnPulses(double referenceAngleRadians){
   return referenceAngleRadians * MK4IModuleConstants.i_kEncoderCPR / 2 / Math.PI;
+}
+
+private void checkMotorCoder(){
+  if(resetIterations < 1){
+    m_turningEncoder.setPositionToAbsolute();
+    resetIterations++;
+  }
 }
 
 }

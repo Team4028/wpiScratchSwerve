@@ -4,7 +4,21 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.DriveConstants.*;
+import static frc.robot.Constants.DriveConstants.i_kFrontLeftDriveMotorPort;
+import static frc.robot.Constants.DriveConstants.i_kFrontLeftEncoderCan;
+import static frc.robot.Constants.DriveConstants.i_kFrontLeftTurningMotorPort;
+import static frc.robot.Constants.DriveConstants.i_kFrontRightDriveMotorPort;
+import static frc.robot.Constants.DriveConstants.i_kFrontRightEncoderCan;
+import static frc.robot.Constants.DriveConstants.i_kFrontRightTurningMotorPort;
+import static frc.robot.Constants.DriveConstants.i_kRearLeftDriveMotorPort;
+import static frc.robot.Constants.DriveConstants.i_kRearLeftEncoderCan;
+import static frc.robot.Constants.DriveConstants.i_kRearLeftTurningMotorPort;
+import static frc.robot.Constants.DriveConstants.i_kRearRightDriveMotorPort;
+import static frc.robot.Constants.DriveConstants.i_kRearRightEncoderCan;
+import static frc.robot.Constants.DriveConstants.i_kRearRightTurningMotorPort;
+import static frc.robot.Constants.DriveConstants.kDriveKinematics;
+import static frc.robot.Constants.DriveConstants.kGyroReversed;
+import static frc.robot.Constants.DriveConstants.kMaxSpeedMetersPerSecond;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
@@ -20,6 +34,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.RobotContainer;
 import frc.robot.util;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -35,10 +50,10 @@ public class DriveSubsystem extends SubsystemBase {
   // private  SwerveModule m_rearRight;
 
 
-  private static final double i_FRONT_LEFT_ANGLE_OFFSET = Math.toRadians(154.6);//205.1);//204.6);//0.0);//60.6);//60.7
-  private static final double i_FRONT_RIGHT_ANGLE_OFFSET = Math.toRadians(169.3);//203.9-18);//204.2);//141.2);//139.1
-  private static final double i_BACK_LEFT_ANGLE_OFFSET = Math.toRadians(31.3);//328.1);//329.4);//60.6);//60.7
-  private static final double i_BACK_RIGHT_ANGLE_OFFSET = Math.toRadians(199.1);//160.5);//160.6);//60.3);//60.7
+  private static final double i_FRONT_LEFT_ANGLE_OFFSET = Math.toRadians(154.6);
+  private static final double i_FRONT_RIGHT_ANGLE_OFFSET = Math.toRadians(169.3);
+  private static final double i_BACK_LEFT_ANGLE_OFFSET = Math.toRadians(31.3);
+  private static final double i_BACK_RIGHT_ANGLE_OFFSET = Math.toRadians(199.1);
 
   private static DriveSubsystem _instance;
   public static final DriveSubsystem get_instance(){
@@ -165,18 +180,18 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   @SuppressWarnings("ParameterName")
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, double additionalSpeedScale) {
-    double speedScale = DriveConstants.BASE_SPEED_SCALE + additionalSpeedScale * (1 - DriveConstants.BASE_SPEED_SCALE);
-    xSpeed *= speedScale;
-    ySpeed *= speedScale;
-    rot *= speedScale;
+  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    double speedScale = DriveConstants.BASE_SPEED_SCALE + RobotContainer.get_instance().getRightTrigger() * (1 - DriveConstants.BASE_SPEED_SCALE);
+    xSpeed *= speedScale * DriveConstants.i_kMaxSpeedMetersPerSecond;
+    ySpeed *= speedScale * DriveConstants.i_kMaxSpeedMetersPerSecond;
+    rot *= speedScale * DriveConstants.i_kMaxSpeedMetersPerSecond;
     var swerveModuleStates =
         kDriveKinematics.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, Rotation2d.fromDegrees((kGyroReversed ? -1.0 : 1.0) * m_gyro.getRotation2d().getDegrees()))
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, 1.0);
+        swerveModuleStates, DriveConstants.i_kMaxSpeedMetersPerSecond);
     setModuleStates(swerveModuleStates);
   }
 

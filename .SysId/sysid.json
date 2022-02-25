@@ -1,11 +1,11 @@
 {
   "SysId": {
-    "Analysis Type": "General Mechanism",
+    "Analysis Type": "Drivetrain",
     "AnalyzerJSONLocation": "C:\\Users\\wruet\\Documents\\sysid_data20220205-161950.json",
     "NetworkTables Settings": {
       "serverTeam": "4028"
     },
-    "mode": "Client",
-    "serverTeam": "172.22.11.2"
+    "mode": "Disabled",
+    "serverTeam": "10.40.28.2"
   }
 }

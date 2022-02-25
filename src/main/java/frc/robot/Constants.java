@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -69,9 +70,15 @@ public final class Constants {
     // These characterization values MUST be determined either experimentally or theoretically
     // for *your* robot's drive.
     // The SysId tool provides a convenient method for obtaining these values for your robot.
-    public static final double ksVolts = 0;
-    public static final double kvVoltSecondsPerMeter = 0;
-    public static final double kaVoltSecondsSquaredPerMeter = 0;
+    public static final double ksVolts = 0.65802;
+    public static final double kvVoltSecondsPerMeter = 2.2288;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.17825;
+
+    public static final SimpleMotorFeedforward driveTrainFeedforward = new SimpleMotorFeedforward(
+      DriveConstants.ksVolts,
+      DriveConstants.kvVoltSecondsPerMeter,
+      DriveConstants.kaVoltSecondsSquaredPerMeter
+    );
 
     public static final double kMaxSpeedMetersPerSecond = util.feetToMeters(12.0);
     public static final double i_kMaxSpeedMetersPerSecond = util.feetToMeters(16.3);
@@ -108,7 +115,7 @@ public final class Constants {
     public static final double i_kWheelDiameterMeters = util.inchesToMeters(4.0);
     public static final double i_kDriveEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
-        (i_kWheelDiameterMeters * Math.PI) * (1.0 / (50.0 / 14.0) / (17.0 / 27.0) / (45.0 / 15.0));
+        (i_kWheelDiameterMeters * Math.PI) * (1.0 / (50.0 / 14.0) / (17.0 / 27.0) / (45.0 / 15.0)) / 2048;
 
     public static final double i_kTurningEncoderDistancePerPulse =
         // Assumes the encoders are on a 1:1 reduction with the module shaft.
@@ -128,13 +135,13 @@ public final class Constants {
 
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = util.feetToMeters(6);
-    public static final double kMaxAccelerationMetersPerSecondSquared = util.feetToMeters(4);
+    public static final double kMaxSpeedMetersPerSecond = util.feetToMeters(16.3);
+    public static final double kMaxAccelerationMetersPerSecondSquared = util.feetToMeters(16.3);
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-    public static final double kPXController = 0;
-    public static final double kPYController = 0;
+    public static final double kPXController = 0.51422;
+    public static final double kPYController = kPXController;
     public static final double kPThetaController = 0;
 
     // Constraint for the motion profilied robot angle controller

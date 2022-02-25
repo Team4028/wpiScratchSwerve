@@ -39,6 +39,14 @@ public class RobotContainer {
 
   JoystickButton _a = new JoystickButton(m_driverController, XboxController.Button.kA.value);
 
+  private static RobotContainer _instance;
+  public static final RobotContainer get_instance(){
+      if(_instance == null){
+          _instance = new RobotContainer();
+      }
+    return _instance;
+  }
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
@@ -54,8 +62,7 @@ public class RobotContainer {
                     util.deadband(-m_driverController.getLeftY()),
                     util.deadband(-m_driverController.getLeftX()),
                     util.deadband(-m_driverController.getRightX()),
-                    true,
-                    m_driverController.getRightTriggerAxis()),
+                    true),
             m_robotDrive));
   }
 
@@ -67,6 +74,10 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
       _a.whenPressed(new InstantCommand(() -> m_robotDrive.zeroHeading()));
+  }
+
+  public double getRightTrigger(){
+      return m_driverController.getRightTriggerAxis();
   }
 
   /**
@@ -89,7 +100,7 @@ public class RobotContainer {
             // Start at the origin facing the +X direction
             new Pose2d(0, 0, new Rotation2d(0)),
             // Pass through these two interior waypoints, making an 's' curve path
-            List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+            List.of(new Translation2d(1.5, 0)),
             // End 3 meters straight ahead of where we started, facing forward
             new Pose2d(3, 0, new Rotation2d(0)),
             config);
@@ -116,6 +127,6 @@ public class RobotContainer {
     m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
 
     // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, 1));
+    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false)).andThen(() -> System.out.println(m_robotDrive.getPose().getX()));
   }
 }
