@@ -83,7 +83,7 @@ public class SwerveModuleCAN {
    * @return The current state of the module.
    */
   public SwerveModuleState getState() {
-    return new SwerveModuleState(m_driveMotor.getSelectedSensorVelocity() * MK4IModuleConstants.i_kDriveEncoderDistancePerPulse, new Rotation2d(getTurningEncoderRadians()));
+    return new SwerveModuleState(m_driveMotor.getSelectedSensorVelocity() * MK4IModuleConstants.i_kDriveEncoderDistancePerPulse * 10, new Rotation2d(getTurningEncoderRadians()));
   }
 
   /**
@@ -134,10 +134,11 @@ private double getTurnPulses(double referenceAngleRadians){
 }
 
 private void checkMotorCoder(){
-  if(resetIterations < 1){
+  if(resetIterations > 250 && m_turningEncoder.getAbsolutePosition() * 4096.0 / 360.0 != m_turningMotor.getSelectedSensorPosition()){
     m_turningEncoder.setPositionToAbsolute();
-    resetIterations++;
+    resetIterations = 0;
   }
+  resetIterations++;
 }
 
 }
